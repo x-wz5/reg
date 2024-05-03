@@ -1,83 +1,8 @@
-local memory = {}
-
--- Memory write functions
-
-function memory.writeByte(address, value)
-    pcall(function()
-        local bytes = {value}
-        game:GetService("ProcessMemory"):WriteAsync(address, bytes)
-    end)
-end
-
-function memory.writeWord(address, value)
-    pcall(function()
-        local bytes = {bit32.band(value, 0xFF), bit32.rshift(value, 8)}
-        game:GetService("ProcessMemory"):WriteAsync(address, bytes)
-    end)
-end
-
-function memory.writeInt(address, value)
-    pcall(function()
-        local bytes = {
-            bit32.band(value, 0xFF),
-            bit32.band(bit32.rshift(value, 8), 0xFF),
-            bit32.band(bit32.rshift(value, 16), 0xFF),
-            bit32.band(bit32.rshift(value, 24), 0xFF)
-        }
-        game:GetService("ProcessMemory"):WriteAsync(address, bytes)
-    end)
-end
-
-function memory.writeFloat(address, value)
-    pcall(function()
-        local bytes = {string.byte(string.pack("f", value), 1, 4)}
-        game:GetService("ProcessMemory"):WriteAsync(address, bytes)
-    end)
-end
-
--- Memory read functions
-
-function memory.readByte(address)
-    local success, result = pcall(function()
-        return game:GetService("ProcessMemory"):ReadAsync(address, 1)[1]
-    end)
-    return success and result or nil
-end
-
-function memory.readWord(address)
-    local success, result = pcall(function()
-        local bytes = game:GetService("ProcessMemory"):ReadAsync(address, 2)
-        return bytes[1] + bytes[2] * 256
-    end)
-    return success and result or nil
-end
-
-function memory.readInt(address)
-    local success, result = pcall(function()
-        local bytes = game:GetService("ProcessMemory"):ReadAsync(address, 4)
-        return bytes[1] + bytes[2] * 256 + bytes[3] * 65536 + bytes[4] * 16777216
-    end)
-    return success and result or nil
-end
-
-function memory.readFloat(address)
-    local success, result = pcall(function()
-        local bytes = game:GetService("ProcessMemory"):ReadAsync(address, 4)
-        return string.unpack("f", string.char(unpack(bytes)))
-    end)
-    return success and result or nil
-end
-
-return memory
-
-
-
 local Decompile, Libraries = {
   WaitDecompile = false,
   getupvalues = false,
   getconstants = false,
-  setclipboard = true,
-  memoryhandling = true
+  setclipboard = true
 }, {
   "bit32",
   "buffer",
@@ -293,11 +218,6 @@ function Decompile.new(part)
   if Decompile.setclipboard then
     setclipboard(Var .. "\n" .. Script .. "\n}")
   end
-  
-  if Decompile.memoryhandling then
-    Script = Script
-  end
-  
   return (Var .. "\n" .. Script .. "\n}")
 end
 
