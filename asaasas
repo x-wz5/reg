@@ -295,51 +295,7 @@ function Decompile.new(part)
   end
   
   if Decompile.memoryhandling then
-    local memoryScript = [[
-      local memory = {}
-      
-      function memory.writeByte(address, value)
-        -- Example: write one byte to address
-        -- Your code here
-      end
-      
-      function memory.writeWord(address, value)
-        -- Example: write two bytes to address
-        -- Your code here
-      end
-      
-      function memory.writeInt(address, value)
-        -- Example: write four bytes to address
-        -- Your code here
-      end
-      
-      function memory.writeFloat(address, value)
-        -- Example: write four bytes as float to address
-        -- Your code here
-      end
-      
-      function memory.readByte(address)
-        -- Example: read one byte from address
-        -- Your code here
-      end
-      
-      function memory.readWord(address)
-        -- Example: read two bytes from address
-        -- Your code here
-      end
-      
-      function memory.readInt(address)
-        -- Example: read four bytes from address
-        -- Your code here
-      end
-      
-      function memory.readFloat(address)
-        -- Example: read four bytes as float from address
-        -- Your code here
-      end
-    ]]
-    
-    Script = memoryScript .. "\n\n" .. Script
+    Script = Script
   end
   
   return (Var .. "\n" .. Script .. "\n}")
