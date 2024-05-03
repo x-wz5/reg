@@ -2,7 +2,7 @@ local Decompile, Libraries = {
   WaitDecompile = false,
   getupvalues = false,
   getconstants = false,
-  setclipboard = true
+  memoryhandling = true
 }, {
   "bit32",
   "buffer",
@@ -215,10 +215,15 @@ function Decompile.new(part)
     end
   end
   
-  if Decompile.setclipboard then
-    setclipboard(Var .. "\n" .. Script .. "\n}")
+  local filePath = "DecompiledScript.txt"
+  local file = io.open(filePath, "w")
+  if file then
+    file:write(Var .. "\n" .. Script .. "\n}")
+    file:close()
+    return "Script decompiled successfully. Saved to file: " .. filePath
+  else
+    return "Failed to open file for writing."
   end
-  return (Var .. "\n" .. Script .. "\n}")
 end
 
 return Decompile
