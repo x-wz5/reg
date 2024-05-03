@@ -2,6 +2,7 @@ local Decompile, Libraries = {
   WaitDecompile = false,
   getupvalues = false,
   getconstants = false,
+  setclipboard = true,
   memoryhandling = true
 }, {
   "bit32",
@@ -215,13 +216,59 @@ function Decompile.new(part)
     end
   end
   
-  local chunkSize = 1000
-  local chunkCount = math.ceil(#Script / chunkSize)
-  for i = 1, chunkCount do
-    local chunk = Script:sub((i - 1) * chunkSize + 1, i * chunkSize)
-    task.wait(3) -- Wait for 3 seconds between each chunk
-    print(chunk) -- You can replace this with your method of loading/displaying the chunk
+  if Decompile.setclipboard then
+    setclipboard(Var .. "\n" .. Script .. "\n}")
   end
+  
+  if Decompile.memoryhandling then
+    local memoryScript = [[
+      local memory = {}
+      
+      function memory.writeByte(address, value)
+        -- Example: write one byte to address
+        -- Your code here
+      end
+      
+      function memory.writeWord(address, value)
+        -- Example: write two bytes to address
+        -- Your code here
+      end
+      
+      function memory.writeInt(address, value)
+        -- Example: write four bytes to address
+        -- Your code here
+      end
+      
+      function memory.writeFloat(address, value)
+        -- Example: write four bytes as float to address
+        -- Your code here
+      end
+      
+      function memory.readByte(address)
+        -- Example: read one byte from address
+        -- Your code here
+      end
+      
+      function memory.readWord(address)
+        -- Example: read two bytes from address
+        -- Your code here
+      end
+      
+      function memory.readInt(address)
+        -- Example: read four bytes from address
+        -- Your code here
+      end
+      
+      function memory.readFloat(address)
+        -- Example: read four bytes as float from address
+        -- Your code here
+      end
+    ]]
+    
+    Script = memoryScript .. "\n\n" .. Script
+  end
+  
+  return (Var .. "\n" .. Script .. "\n}")
 end
 
 return Decompile
