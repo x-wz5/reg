@@ -1,0 +1,224 @@
+local Decompile, Libraries = {
+  WaitDecompile = false,
+  getupvalues = false,
+  getconstants = false,
+  setclipboard = true
+}, {
+  "bit32",
+  "buffer",
+  "coroutine",
+  "debug",
+  "math",
+  "os",
+  "string",
+  "table",
+  "task",
+  "utf8"
+}
+
+local Variables = {}
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+
+local function Wait()
+  if Decompile.WaitDecompile then
+    task.wait()
+  end
+end
+
+local function IsInvalid(str)
+  return str:find("[ %d%+%-%/|]") ~= nil
+end
+
+local function GetParams(func)
+  local Info, Vals = debug.getinfo(func), {}
+  for ind = 1, Info.numparams do
+    table.insert(Vals, "Val" .. tostring(ind))
+  end
+  if Info.is_vararg > 0 then
+    table.insert(Vals, "...")
+  end
+  return table.concat(Vals, ", ")
+end
+
+local function GetColorRGB(Color)
+  local R, G, B = math.floor(Color.R * 255), math.floor(Color.G * 255), math.floor(Color.B * 255)
+  return R .. ", " .. G .. ", " .. B
+end
+
+local function GetIndex(Index)
+  if tostring(Index):len() < 1 or IsInvalid(tostring(Index)) then
+    return "[\"" .. tostring(Index) .. "\"]"
+  elseif tonumber(Index) then
+    return "[" .. tostring(Index) .. "]"
+  else
+    return tostring(Index)
+  end
+end
+
+function Decompile:Type(part, Lines)
+  Wait()
+  local type = typeof(part)
+  local Script = ""
+
+  if type == "boolean" then
+    Script = Script .. tostring(part)
+  elseif type == "nil" then
+    Script = Script .. "nil"
+  elseif type == "table" then
+    Script = Script .. "{"
+    local IsFirst = false
+    for a, b in pairs(part) do
+      if IsFirst then
+        Script = Script .. ","
+      end
+      Script = Script .. "\n" .. Lines .. "  " .. GetIndex(a) .. " = "
+      Script = Script .. Decompile:Type(b, Lines .. "  ")
+      IsFirst = true
+    end
+    Script = Script .. (IsFirst and "\n" .. Lines or "") .. "}"
+  elseif type == "string" then
+    Script = Script .. '"' .. part .. '"'
+  elseif type == "Instance" then
+    local firstName, Variavel2 = "", ""
+    local Separator = part:GetFullName():split(".")
+    for _, b in pairs(Separator) do
+      if not firstName then
+        local var = b:gsub(" ", "")
+        if not game:FindFirstChild(var) then
+          return var .. " --[[ nil Instance ]]"
+        elseif var == "Workspace" then
+          firstName = "workspace"
+        else
+          firstName = var
+          table.insert(Variables, var)
+        end
+      else
+        if b == Player.Name and firstName == "Players" then
+          Variavel2 = Variavel2 .. ".LocalPlayer"
+        elseif b == Player.Name and firstName == "workspace" then
+          table.insert(Variables, "Players")
+          Variavel2, firstName = "Players.LocalPlayer.Character", ""
+        elseif b == "Camera" and firstName == "workspace" then
+          Variavel2 = Variavel2 .. ".CurrentCamera"
+        elseif IsInvalid(b) then
+          Variavel2 = Variavel2 .. '["' .. b .. '"]'
+        else
+          Variavel2 = Variavel2 .. "." .. b
+        end
+      end
+    end
+    Script = Script .. firstName .. Variavel2
+  elseif type == "function" then
+    Script = Script .. "function(" .. GetParams(part) .. ")"
+    local HaveVal, constants, upvalues = false, "", ""
+    
+    if Decompile.getupvalues then
+      local uptable = getupvalues and getupvalues(part)
+      
+      if uptable and typeof(uptable) == "table" and #uptable > 0 then
+        upvalues, HaveVal = upvalues .. "\n" .. Lines .. "  local upvalues = {", true
+        for ind, val in pairs(uptable) do
+          upvalues = upvalues .. "\n" .. Lines .. "    [" .. tostring(ind) .. "] = " .. Decompile:Type(val, Lines .. "    ")
+        end
+        upvalues = upvalues .. "\n" .. Lines .. "  }"
+      end
+    end
+    if Decompile.getconstants then
+      local uptable = getconstants and getconstants(part)
+      
+      if uptable and typeof(uptable) == "table" and #uptable > 0 then
+        constants, HaveVal = constants .. "\n" .. Lines .. "  local constants = {", true
+        for ind, val in pairs(uptable) do
+          constants = constants .. "\n" .. Lines .. "    [" .. tostring(ind) .. "] = " .. Decompile:Type(val, Lines .. "    ")
+        end
+        constants = constants .. "\n" .. Lines .. "  }"
+      end
+    end
+    
+    local endType = HaveVal and "\n" .. Lines .. "end" or "end"
+    Script = Script .. upvalues .. constants .. endType
+  elseif type == "CFrame" then
+    Script = Script .. "CFrame.new(" .. tostring(part) .. ")"
+  elseif type == "Color3" then
+    Script = Script .. "Color3.fromRGB(" .. GetColorRGB(part) .. ")"
+  elseif type == "BrickColor" then
+    Script = Script .. 'BrickColor.new("' .. tostring(part) .. '")'
+  elseif type == "Vector2" then
+    Script = Script .. "Vector2.new(" .. tostring(part) .. ")"
+  elseif type == "Vector3" then
+    Script = Script .. "Vector3.new(" .. tostring(part) .. ")"
+  elseif type == "UDim" then
+    Script = Script .. "UDim.new(" .. tostring(part) .. ")"
+  elseif type == "UDim2" then
+    Script = Script .. "UDim2.new(" .. tostring(part) .. ")"
+  elseif type == "TweenInfo" then
+    Script = Script .. "TweenInfo.new(" .. tostring(part) .. ")"
+  elseif type == "Axes" then
+    Script = Script .. "Axes.new(" .. tostring(part) .. ")"
+  else
+    Script = Script .. tostring(part)
+  end
+  return Script
+end
+
+function Decompile.new(part)
+  local Metodo
+  Variables = {}
+  local function GetClass(partGet)
+    if typeof(partGet) == "Instance" then
+      if partGet:IsA("LocalScript") then
+        Metodo = "getsenv"
+        return getsenv(partGet)
+      elseif partGet:IsA("ModuleScript") then
+        local Script = require(partGet)
+        Metodo = "require"
+        if typeof(Script) == "function" then
+          Metodo = Metodo .. ", getupvalues"
+          return getupvalues(Script)
+        end
+        return Script
+      end
+    end
+    return partGet
+  end
+  
+  local Script, Lines, IsFirst = typeof(part) == "Instance" and "%slocal Script = " .. Decompile:Type(part) .. "\n\n" or "", "  "
+  Script = Script .. "local Decompile = {"
+  
+  local PartClass = GetClass(part)
+  if typeof(PartClass) == "table" then
+    for a, b in pairs(PartClass) do
+      if IsFirst then
+        Script = Script .. ","
+      end
+      Script = Script .. "\n"
+      Script = Script .. Lines .. GetIndex(a) .. ' = '
+      Script = Script .. Decompile:Type(b, Lines)
+      IsFirst = true
+    end
+  else
+    Script = Script .. "\n" .. Lines .. "[\"1\"] = " .. Decompile:Type(PartClass, Lines)
+  end
+  
+  if Metodo then
+    Script = Script:format("local Method = " .. Metodo .. "\n")
+  else
+    Script = Script:format("")
+  end
+  
+  local Var, list = "", {}
+  for _, Val in ipairs(Variables) do
+    if not table.find(list, Val) then
+      Var = Var .. "local " .. Val .. "\ = game:GetService(\"" .. Val .. "\")\n"
+      table.insert(list, Val)
+    end
+  end
+  
+  if Decompile.setclipboard then
+    setclipboard(Var .. "\n" .. Script .. "\n}")
+  end
+  return (Var .. "\n" .. Script .. "\n}")
+end
+
+return Decompile
