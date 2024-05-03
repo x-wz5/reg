@@ -215,14 +215,12 @@ function Decompile.new(part)
     end
   end
   
-  local filePath = "DecompiledScript.txt"
-  local file = io.open(filePath, "w")
-  if file then
-    file:write(Var .. "\n" .. Script .. "\n}")
-    file:close()
-    return "Script decompiled successfully. Saved to file: " .. filePath
-  else
-    return "Failed to open file for writing."
+  local chunkSize = 1000
+  local chunkCount = math.ceil(#Script / chunkSize)
+  for i = 1, chunkCount do
+    local chunk = Script:sub((i - 1) * chunkSize + 1, i * chunkSize)
+    task.wait(3) -- Wait for 3 seconds between each chunk
+    print(chunk) -- You can replace this with your method of loading/displaying the chunk
   end
 end
 
