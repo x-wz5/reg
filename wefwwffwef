@@ -1,22 +1,22 @@
-local Decompile, Libraries = {
-  WaitDecompile = false,
-  getupvalues = false,
-  getconstants = false,
-  setclipboard = true
-}, {
-  "bit32",
-  "buffer",
-  "coroutine",
-  "debug",
-  "math",
-  "os",
-  "string",
-  "table",
-  "task",
-  "utf8"
+local Decompile = {
+    WaitDecompile = false,
+    getupvalues = false,
+    getconstants = false,
+    setclipboard = true
 }
 
-
+local Libraries = {
+    "bit32",
+    "buffer",
+    "coroutine",
+    "debug",
+    "math",
+    "os",
+    "string",
+    "table",
+    "task",
+    "utf8"
+}
 
 local function Wait()
     if Decompile.WaitDecompile then
