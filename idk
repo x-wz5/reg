@@ -16,7 +16,7 @@ local Decompile, Libraries = {
   "utf8"
 }
 
-local Decompile = {}
+
 
 local function Wait()
     if Decompile.WaitDecompile then
