@@ -1,224 +1,151 @@
-local Decompile, Libraries = {
-  WaitDecompile = false,
-  getupvalues = false,
-  getconstants = false,
-  setclipboard = true
-}, {
-  "bit32",
-  "buffer",
-  "coroutine",
-  "debug",
-  "math",
-  "os",
-  "string",
-  "table",
-  "task",
-  "utf8"
-}
+local CoreUi = game:GetService("CoreGui")
 
-local Variables = {}
-local Players = game:GetService("Players")
-local Player = Players.LocalPlayer
 
-local function Wait()
-  if Decompile.WaitDecompile then
-    task.wait()
-  end
+local Buttons = {}
+local Window = {}
+local Tab = {}
+local Tabs = {}
+
+Window.__index = Window
+Buttons.__index = Buttons
+Tab.__index = Tab
+
+
+function Window.new(name)
+local self = setmetatable({}, Window)
+
+self.Sg = Instance.new("ScreenGui")
+self.Frame = Instance.new("Frame")
+self.Corner = Instance.new("UICorner")
+self.Corner2 = Instance.new("UICorner")
+self.title = Instance.new("TextLabel")
+self.TabHandler = Instance.new("Frame")
+
+self.Sg.Parent = CoreUi
+self.Frame.Parent = self.Sg
+self.Corner.Parent = self.Frame
+self.Corner2.Parent = self.TabHandler
+self.title.Parent = self.Frame
+self.TabHandler.Parent = self.Frame
+
+self.Frame.Size = UDim2.new(0.55, 0, 0.60, 0)
+self.Frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+self.Frame.BackgroundColor3 = Color3.fromRGB(37, 37, 37)
+self.Frame.Active = true
+self.Frame.Draggable = true
+
+self.title.BackgroundTransparency = 1
+self.title.Text = name
+self.title.Font = Enum.Font.FredokaOne
+
+self.Corner.CornerRadius = UDim.new(0, 6)
+self.Corner2.CornerRadius = UDim.new(0, 6)
+
+self.TabHandler.Size = UDim2.new(0.20, 0, 1, 0)
+self.TabHandler.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+
+return self
 end
 
-local function IsInvalid(str)
-  return str:find("[ %d%+%-%/|]") ~= nil
-end
 
-local function GetParams(func)
-  local Info, Vals = debug.getinfo(func), {}
-  for ind = 1, Info.numparams do
-    table.insert(Vals, "Val" .. tostring(ind))
-  end
-  if Info.is_vararg > 0 then
-    table.insert(Vals, "...")
-  end
-  return table.concat(Vals, ", ")
-end
 
-local function GetColorRGB(Color)
-  local R, G, B = math.floor(Color.R * 255), math.floor(Color.G * 255), math.floor(Color.B * 255)
-  return R .. ", " .. G .. ", " .. B
-end
 
-local function GetIndex(Index)
-  if tostring(Index):len() < 1 or IsInvalid(tostring(Index)) then
-    return "[\"" .. tostring(Index) .. "\"]"
-  elseif tonumber(Index) then
-    return "[" .. tostring(Index) .. "]"
-  else
-    return tostring(Index)
-  end
-end
+local myWindow = Window.new("test")
 
-function Decompile:Type(part, Lines)
-  Wait()
-  local type = typeof(part)
-  local Script = ""
 
-  if type == "boolean" then
-    Script = Script .. tostring(part)
-  elseif type == "nil" then
-    Script = Script .. "nil"
-  elseif type == "table" then
-    Script = Script .. "{"
-    local IsFirst = false
-    for a, b in pairs(part) do
-      if IsFirst then
-        Script = Script .. ","
-      end
-      Script = Script .. "\n" .. Lines .. "  " .. GetIndex(a) .. " = "
-      Script = Script .. Decompile:Type(b, Lines .. "  ")
-      IsFirst = true
-    end
-    Script = Script .. (IsFirst and "\n" .. Lines or "") .. "}"
-  elseif type == "string" then
-    Script = Script .. '"' .. part .. '"'
-  elseif type == "Instance" then
-    local firstName, Variavel2 = "", ""
-    local Separator = part:GetFullName():split(".")
-    for _, b in pairs(Separator) do
-      if not firstName then
-        local var = b:gsub(" ", "")
-        if not game:FindFirstChild(var) then
-          return var .. " --[[ nil Instance ]]"
-        elseif var == "Workspace" then
-          firstName = "workspace"
-        else
-          firstName = var
-          table.insert(Variables, var)
-        end
+
+function Window:NewTab(name)
+local self = setmetatable({}, Tab)
+
+
+self.TabBtn = Instance.new("TextButton")
+
+self.TabMain = Instance.new("Frame")
+self.Corner = Instance.new("UICorner")
+self.Corner2 = Instance.new("UICorner")
+self.Layout = Instance.new("UIListLayout")
+self.TabFrame = Instance.new("Frame")
+self.Corner.Parent = self.TabBtn
+self.Corner2.Parent = self.TabFrame
+
+self.Corner.CornerRadius = UDim.new(0, 6)
+self.Corner2.CornerRadius = UDim.new(0, 6)
+
+self.TabBtn.Size = UDim2.new(1, 0, 0.07, 0)
+self.TabBtn.BackgroundTransparency = 0
+self.TabBtn.Text = name
+self.TabBtn.Font = Enum.Font.FredokaOne
+self.TabBtn.Parent = myWindow.TabHandler
+self.Layout.Parent = myWindow.TabHandler
+self.TabFrame.Parent = myWindow.Frame
+
+
+self.TabFrame.Size = UDim2.new(0.72,0,0.98,0)
+self.TabFrame.Position = UDim2.new(0.25,0,0.01,0)
+self.TabFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+
+self.TabBtn.BackgroundColor3 = Color3.fromRGB(40,40,40)
+self.TabBtn.TextColor3 = Color3.fromRGB(0,0,0)
+self.TabBtn.TextSize = 14
+
+self.TabFrame.Visible = false
+
+self.Layout.Padding = UDim.new(0,3)
+
+Tabs[name] = self.TabFrame
+
+self.TabBtn.MouseButton1Click:Connect(function()
+for k,v in pairs(Tabs) do
+    if k ~= name then
+      v.Visible = false
       else
-        if b == Player.Name and firstName == "Players" then
-          Variavel2 = Variavel2 .. ".LocalPlayer"
-        elseif b == Player.Name and firstName == "workspace" then
-          table.insert(Variables, "Players")
-          Variavel2, firstName = "Players.LocalPlayer.Character", ""
-        elseif b == "Camera" and firstName == "workspace" then
-          Variavel2 = Variavel2 .. ".CurrentCamera"
-        elseif IsInvalid(b) then
-          Variavel2 = Variavel2 .. '["' .. b .. '"]'
-        else
-          Variavel2 = Variavel2 .. "." .. b
-        end
+       v.Visible = true
       end
     end
-    Script = Script .. firstName .. Variavel2
-  elseif type == "function" then
-    Script = Script .. "function(" .. GetParams(part) .. ")"
-    local HaveVal, constants, upvalues = false, "", ""
-    
-    if Decompile.getupvalues then
-      local uptable = getupvalues and getupvalues(part)
-      
-      if uptable and typeof(uptable) == "table" and #uptable > 0 then
-        upvalues, HaveVal = upvalues .. "\n" .. Lines .. "  local upvalues = {", true
-        for ind, val in pairs(uptable) do
-          upvalues = upvalues .. "\n" .. Lines .. "    [" .. tostring(ind) .. "] = " .. Decompile:Type(val, Lines .. "    ")
-        end
-        upvalues = upvalues .. "\n" .. Lines .. "  }"
-      end
-    end
-    if Decompile.getconstants then
-      local uptable = getconstants and getconstants(part)
-      
-      if uptable and typeof(uptable) == "table" and #uptable > 0 then
-        constants, HaveVal = constants .. "\n" .. Lines .. "  local constants = {", true
-        for ind, val in pairs(uptable) do
-          constants = constants .. "\n" .. Lines .. "    [" .. tostring(ind) .. "] = " .. Decompile:Type(val, Lines .. "    ")
-        end
-        constants = constants .. "\n" .. Lines .. "  }"
-      end
-    end
-    
-    local endType = HaveVal and "\n" .. Lines .. "end" or "end"
-    Script = Script .. upvalues .. constants .. endType
-  elseif type == "CFrame" then
-    Script = Script .. "CFrame.new(" .. tostring(part) .. ")"
-  elseif type == "Color3" then
-    Script = Script .. "Color3.fromRGB(" .. GetColorRGB(part) .. ")"
-  elseif type == "BrickColor" then
-    Script = Script .. 'BrickColor.new("' .. tostring(part) .. '")'
-  elseif type == "Vector2" then
-    Script = Script .. "Vector2.new(" .. tostring(part) .. ")"
-  elseif type == "Vector3" then
-    Script = Script .. "Vector3.new(" .. tostring(part) .. ")"
-  elseif type == "UDim" then
-    Script = Script .. "UDim.new(" .. tostring(part) .. ")"
-  elseif type == "UDim2" then
-    Script = Script .. "UDim2.new(" .. tostring(part) .. ")"
-  elseif type == "TweenInfo" then
-    Script = Script .. "TweenInfo.new(" .. tostring(part) .. ")"
-  elseif type == "Axes" then
-    Script = Script .. "Axes.new(" .. tostring(part) .. ")"
-  else
-    Script = Script .. tostring(part)
-  end
-  return Script
+end)
+
+return self
+end
+function test()
+print("test")
 end
 
-function Decompile.new(part)
-  local Metodo
-  Variables = {}
-  local function GetClass(partGet)
-    if typeof(partGet) == "Instance" then
-      if partGet:IsA("LocalScript") then
-        Metodo = "getsenv"
-        return getsenv(partGet)
-      elseif partGet:IsA("ModuleScript") then
-        local Script = require(partGet)
-        Metodo = "require"
-        if typeof(Script) == "function" then
-          Metodo = Metodo .. ", getupvalues"
-          return getupvalues(Script)
-        end
-        return Script
-      end
-    end
-    return partGet
-  end
-  
-  local Script, Lines, IsFirst = typeof(part) == "Instance" and "%slocal Script = " .. Decompile:Type(part) .. "\n\n" or "", "  "
-  Script = Script .. "local Decompile = {"
-  
-  local PartClass = GetClass(part)
-  if typeof(PartClass) == "table" then
-    for a, b in pairs(PartClass) do
-      if IsFirst then
-        Script = Script .. ","
-      end
-      Script = Script .. "\n"
-      Script = Script .. Lines .. GetIndex(a) .. ' = '
-      Script = Script .. Decompile:Type(b, Lines)
-      IsFirst = true
-    end
-  else
-    Script = Script .. "\n" .. Lines .. "[\"1\"] = " .. Decompile:Type(PartClass, Lines)
-  end
-  
-  if Metodo then
-    Script = Script:format("local Method = " .. Metodo .. "\n")
-  else
-    Script = Script:format("")
-  end
-  
-  local Var, list = "", {}
-  for _, Val in ipairs(Variables) do
-    if not table.find(list, Val) then
-      Var = Var .. "local " .. Val .. "\ = game:GetService(\"" .. Val .. "\")\n"
-      table.insert(list, Val)
-    end
-  end
-  
-  if Decompile.setclipboard then
-    setclipboard(Var .. "\n" .. Script .. "\n}")
-  end
-  return (Var .. "\n" .. Script .. "\n}")
-end
+function Tab:NewButton(P,Name,Callback)
+local self = setmetatable({},Buttons)
+self.button = Instance.new("TextButton")
+self.Corner = Instance.new("UICorner")
+self.List = Instance.new("UIListLayout")
 
-return Decompile
+self.button.Parent = P.TabFrame
+self.button.Text = Name
+self.button.Font = Enum.Font.FredokaOne
+self.button.Size = UDim2.new(0, 0.4, 0, 0.2)
+self.button.Position = UDim2.new(0.5,0,1.2,0)
+self.button.TextColor3 = Color3.fromRGB(0,0,0)
+self.button.TextSize = 14
+
+
+self.Corner.Parent = self.button
+self.Corner.CornerRadius = UDim.new(0,6)
+
+self.button.BackgroundColor3 = Color3.new(1, 1, 1)
+
+self.button.MouseButton1Click:Connect(function() 
+Callback()
+   end)
+   
+   return self
+end
+function test() 
+print("test")
+end
+local tab1 = Window:NewTab("test")
+local tab2 = Window:NewTab("Hi")
+Tab:NewButton(tab1,"test1",test)
+Tab:NewButton(tab2,"test2",test)
+
+
+
+
+
+
