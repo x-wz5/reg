@@ -1,23 +1,26 @@
 local result = ""
 local s = game.Players.LocalPlayer.PlayerScripts.LocalScript
+
 local opcodes = {
-    [22] = "if"
+    [22] = "if",
+    [30] = "JMP" -- Add other opcodes here as needed
 }
-function findIf(bytecode,Line)
 
-
-    function parseBytecode(bytecode)
-        local instructions = {}
-        local i = 1
-        while i < #bytecode do
-            local byte = string.byte(bytecode,i)
-            local opc = opcodes[byte]
-            table.insert(instructions,{opcode = opc,byte = byte, line = i})
-        end
-        return instructions
+-- Define parseBytecode outside so it's accessible
+function parseBytecode(bytecode)
+    local instructions = {}
+    local i = 1
+    while i <= #bytecode do
+        local byte = string.byte(bytecode, i)
+        local opc = opcodes[byte]
+        table.insert(instructions, {opcode = opc, byte = byte, line = i})
+        i = i + 1
     end
+    return instructions
 end
-local instructions = parseBytecode(bytecode)
+
+function findIf(bytecode, Line)
+    local instructions = parseBytecode(bytecode)
 
     -- Process instructions and track jumps
     for _, instr in ipairs(instructions) do
@@ -26,7 +29,7 @@ local instructions = parseBytecode(bytecode)
             local jumpOffset = string.byte(bytecode, instr.line + 1)
             -- Calculate the target line for the jump
             local targetLine = instr.line + jumpOffset + 1 -- +1 to account for next instruction
-            
+
             if jumpOffset < 0x80 then  -- Forward jump
                 print("JMP at line " .. instr.line .. " jumps forward to line " .. targetLine)
             else  -- Backward jump (if negative)
@@ -38,5 +41,5 @@ local instructions = parseBytecode(bytecode)
     end
 end
 
-local bytecode = getscriptbytecode(s)
-print(findIf(bytecode, 1))
+local bytecode = getscriptbytecodes(s)
+findIf(bytecode, 1)
