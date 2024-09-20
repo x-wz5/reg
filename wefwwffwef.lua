@@ -1,22 +1,20 @@
 local result = ""
 local s = game.Players.LocalPlayer.PlayerScripts.LocalScript
 local opcodes = {
-    [22] = "if"
+    [22] = "JMP"
 }
-function findIf(bytecode,Line)
-
-
-    function parseBytecode(bytecode)
-        local instructions = {}
-        local i = 1
-        while i < #bytecode do
-            local byte = string.byte(bytecode,i)
-            local opc = opcodes[byte]
-            table.insert(instructions,{opcode = opc,byte = byte, line = i})
-        end
-        return instructions
+function parseBytecode(bytecode,line)
+    local instructions = {}
+    local i = 1
+    while i < #bytecode do
+        local byte = string.byte(bytecode,i)
+        local opc = opcodes[byte]
+        table.insert(instructions,{opcode = opc,byte = byte, line = i})
     end
+    return instructions
 end
+
+
 local instructions = parseBytecode(bytecode)
 
     -- Process instructions and track jumps
@@ -39,4 +37,4 @@ local instructions = parseBytecode(bytecode)
 
 
 local bytecode = getscriptbytecode(s)
-print(findIf(bytecode, 1))
+findIf(bytecode, 1)
