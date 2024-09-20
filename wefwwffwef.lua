@@ -38,4 +38,4 @@ local instructions = parseBytecode(bytecode)
 end
 
 local bytecode = getscriptbytecodes(s)
-print(findJumpTarget(bytecode, 1))
+print(findIf(bytecode, 1))
