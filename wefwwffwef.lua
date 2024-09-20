@@ -17,7 +17,7 @@ end
 
 local instructions = parseBytecode(bytecode)
 
-    -- Process instructions and track jumps
+    
     for _, instr in ipairs(instructions) do
         if instr.opcode == "JMP" then
             -- Assuming the byte following JMP is the offset
@@ -37,4 +37,4 @@ local instructions = parseBytecode(bytecode)
 
 
 local bytecode = getscriptbytecode(s)
-findIf(bytecode, 1)
+parseBytecode(bytecode, 1)
