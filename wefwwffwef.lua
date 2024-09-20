@@ -73,16 +73,9 @@ local function processBytecode(bytecode)
                 print("JMP at line " .. instr.line .. " jumps backward to line " .. targetLine)
             end
         else
-            print(
-            "Opcode " ..
-             tostring(instr.opcode)
-              or 
-              "" 
-             .. " found at line " 
-             .. 
-             tostring(instr.line) 
-             or 
-             "")
+            if instr.opcode and instr.line then
+            print("Opcode " ..instr.opcode.. " found at line " ..instr.line)
+            end
         end
     end
 end
