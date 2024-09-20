@@ -10,8 +10,13 @@ function parseBytecode(bytecode)
     local i = 1
     while i <= #bytecode do
         local byte = string.byte(bytecode, i)
-        local opc = opcodes[byte] -- Lookup the opcode based on byte value
-        table.insert(instructions, {opcode = opc, byte = byte, line = i})
+        local opc = opcodes[byte]
+
+        -- Ensure that the opcode is defined, otherwise skip this instruction
+        if opc then
+            table.insert(instructions, {opcode = opc, byte = byte, line = i})
+        end
+
         i = i + 1 -- Increment to avoid infinite loop
     end
     return instructions
