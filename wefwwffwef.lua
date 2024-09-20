@@ -59,22 +59,23 @@ local function processBytecode(bytecode)
     local instructions = parseBytecode(bytecode)
 
     for _, instr in ipairs(instructions) do
-        if instr.opcode == "JMP" then
-            -- Assuming the byte following JMP is the offset
-            local jumpOffset = string.byte(bytecode, instr.line + 1)
-            -- Calculate the target line for the jump
-            local targetLine = instr.line + jumpOffset + 1 -- +1 to account for next instruction
-
-            if jumpOffset < 0x80 then  -- Forward jump
-                print("JMP at line " .. instr.line .. " jumps forward to line " .. targetLine)
-            else  -- Backward jump (if negative)
-                local negativeOffset = jumpOffset - 0x100
-                targetLine = instr.line + negativeOffset + 1
-                print("JMP at line " .. instr.line .. " jumps backward to line " .. targetLine)
+        local value = nil
+        
+        -- Assuming the next byte(s) after the opcode represent the value
+        if instr.opcode then
+            if instr.opcode == "LOADK" then
+                value = string.byte(bytecode, instr.line + 1) -- Example for LOADK
+            elseif instr.opcode == "LOADBOOL" then
+                value = string.byte(bytecode, instr.line + 1) -- Example for LOADBOOL
+            elseif instr.opcode == "JMP" then
+                value = string.byte(bytecode, instr.line + 1) -- Example for JMP
             end
-        else
-            if instr.opcode and instr.line then
-            print("Opcode " ..instr.opcode.. " found at line " ..instr.line)
+            -- Add more conditions here for other opcodes as needed
+            
+            if value then
+                print("Opcode " .. instr.opcode .. " found at line " .. instr.line .. " with value: " .. value)
+            else
+                print("Opcode " .. instr.opcode .. " found at line " .. instr.line)
             end
         end
     end
