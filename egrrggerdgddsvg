@@ -1,49 +1,41 @@
 local cFlow = {}
 
 local ReadScript = game:HttpGet("https://raw.githubusercontent.com/x-wz5/reg/refs/heads/main/wefwwffwef.lua")
-
 local Read = loadstring(ReadScript)()
 
 local opc = {
-    [26] = "JMP",          -- Unconditional jump
-    [27] = "JMPIF",        -- Jump if condition is true (e.g., for `if` or `while`)
-    [28] = "JMPNOT",       -- Jump if condition is false (inverse of JMPIF)
-    [29] = "TEST",         -- Test a condition (e.g., comparison result)
-    [30] = "TESTSET",      -- Conditional set based on test
-    [31] = "EQ",           -- Equality check
-    [32] = "LT",           -- Less-than check
-    [33] = "LE",           -- Less-than-or-equal check
-    [34] = "CALL",         -- Function call (could involve control flow)
-    [35] = "RETURN",       -- Return from function (used in control flow)
-    [36] = "FORPREP",      -- Prepare for loop (for loop start)
-    [37] = "FORLOOP",      -- Loop (for loop increment)
-    [38] = "TFORLOOP",     -- Generic for loop (with iterator)
+    [26] = "JMP",
+    [27] = "JMPIF",
+    [28] = "JMPNOT",
+    [29] = "TEST",
+    [30] = "TESTSET",
+    [31] = "EQ",
+    [32] = "LT",
+    [33] = "LE",
+    [34] = "CALL",
+    [35] = "RETURN",
+    [36] = "FORPREP",
+    [37] = "FORLOOP",
+    [38] = "TFORLOOP",
 }
 
 function cFlow.new(bytecode)
-  local Reader = Read.new(bytecode)
-  local self = {}
-  
-  function self:getAlIf()
-    local result = ""
-    while Reader.cursor < Reader:len() do
-      local cursor = Reader.cursor
-      local byte = Reader:nextByte()
-      
-        if byte == 26 then
-        result = result..opc[26].."\n"
+    local Reader = Read.new(bytecode)
+    local self = {}
+
+    function self:getAllIf()  -- Corrected function name
+        local result = ""
+        while Reader.cursor < Reader:len() do
+            local byte = Reader:nextByte()
+
+            if opc[byte] then  -- Simplified check using the opc table
+                result = result .. opc[byte] .. "\n"
+            end
         end
-        if byte == 27 then
-          result = result..opc[27].."\n"
-        end
-        if byte == 28 then 
-          result = result..opc[28].."\n"
-        end
-      cursor = cursor + 1
+        return result
     end
-    return result
-  end
-  return self
+
+    return self
 end
 
 return cFlow
