@@ -61,8 +61,9 @@ end
 		if len == 0 then
 			return ""
 		else
+		  len = len or self:nextVarInt()
 			local result = buffer.readstring(stream, cursor, len)
-			cursor += len
+			cursor = cursor + len
 			return result
 		end
 	end
