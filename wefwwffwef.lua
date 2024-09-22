@@ -1,88 +1,86 @@
-local result = ""
-local s = game.Players.LocalPlayer.PlayerScripts.LocalScript
-local opcodes = {
-    [0] = "MOVE",
-    [1] = "LOADK",
-    [2] = "LOADBOOL",
-    [3] = "LOADNIL",
-    [4] = "GETUPVAL",
-    [5] = "GETGLOBAL",
-    [6] = "GETTABLE",
-    [7] = "SETGLOBAL",
-    [8] = "SETUPVAL",
-    [9] = "SETTABLE",
-    [10] = "NEWTABLE",
-    [11] = "SELF",
-    [12] = "ADD",
-    [13] = "SUB",
-    [14] = "MUL",
-    [15] = "DIV",
-    [16] = "MOD",
-    [17] = "POW",
-    [18] = "UNM",
-    [19] = "NOT",
-    [20] = "LEN",
-    [21] = "CONCAT",
-    [22] = "JMP",
-    [23] = "EQ",
-    [24] = "LT",
-    [25] = "LE",
-    [26] = "TEST",
-    [27] = "TESTSET",
-    [28] = "CALL",
-    [29] = "TAILCALL",
-    [30] = "RETURN",
-    [31] = "FORLOOP",
-    [32] = "FORPREP",
-    [33] = "TFORLOOP",
-    [34] = "SETLIST",
-    [35] = "CLOSE",
-    [36] = "CLOSURE",
-    [37] = "VARARG"
-}
+local Read = {}
+local FLOAT_PRECISION = 24
 
--- Corrected parseBytecode function
-function parseBytecode(bytecode)
-    local instructions = {}
-    local i = 1
-    while i <= #bytecode do
-        local byte = string.byte(bytecode, i)
-        local opc = opcodes[byte] -- Lookup the opcode based on byte value
-        table.insert(instructions, {opcode = opc, byte = byte, line = i})
-        i = i + 1 -- Increment to avoid infinite loop
+Read.__index = Read
+
+function Read.new(bytecode)
+  local self = {}
+  local stream = buffer.fromstring(bytecode)
+  local cursor = 0
+  
+  function self:len()
+    return buffer.len(stream)
+  end
+  
+  function self:nextByte()
+    local result = buffer.readu8(stream, cursor)
+    cursor = cursor + 1
+    return result
+  end
+
+  function self:nextBytes(count)
+    local bytes = {}
+    for j = 1, count do
+      table.insert(bytes, self:nextByte())
     end
-    return instructions
+    return bytes
+  end
+
+  function self:nextChar()
+    return string.char(self:nextByte())
+  end
+  
+  function self:readUInt32()
+    local res = buffer.readu32(stream,cursor)
+    cursor = cursor + 4
+    return res
+  end
+  function self:readUInt32()
+    local res = buffer.readi32(stream,cursor)
+    cursor = cursor + 4
+    return res
+  end
+  function self:readFloat()
+    local res = buffer.readu32(stream,cursor)
+    cursor = cursor + 4
+    return tonumber(string.format(`%0.{FLOAT_PRECISION}f`, result))
+  end
+  function self:nextVarInt()
+		local result = 0
+		for i = 0, 4 do
+			local b = self:nextByte()
+			result = bit32.bor(result, bit32.lshift(bit32.band(b, 0x7F), i * 7))
+			if not bit32.btest(b, 0x80) then
+				break
+			end
+		end
+		function self:nextString(len)
+		len = len or self:nextVarInt()
+		if len == 0 then
+			return ""
+		else
+			local result = buffer.readstring(stream, cursor, len)
+			cursor += len
+			return result
+		end
+	end
+
+	function self:nextDouble()
+		local result = buffer.readf64(stream, cursor)
+		cursor += 8
+		return result
+	end
+	
+		return result
+  end
+
+
+  return self
 end
 
--- Main logic to process bytecode
-local function processBytecode(bytecode)
-    local instructions = parseBytecode(bytecode)
-
-    for _, instr in ipairs(instructions) do
-        local value = nil
-        
-        -- Assuming the next byte(s) after the opcode represent the value
-        if instr.opcode then
-            if instr.opcode == "LOADK" then
-                value = string.byte(bytecode, instr.line + 1) -- Example for LOADK
-            elseif instr.opcode == "LOADBOOL" then
-                value = string.byte(bytecode, instr.line + 1) -- Example for LOADBOOL
-            elseif instr.opcode == "JMP" then
-                value = string.byte(bytecode, instr.line + 1) -- Example for JMP
-            end
-            -- Add more conditions here for other opcodes as needed
-            
-            if value then
-                print("Opcode " .. instr.opcode .. " found at line " .. instr.line .. " with value: " .. value)
-            else
-                print("Opcode " .. instr.opcode .. " found at line " .. instr.line)
-            end
-        end
-    end
+function Reader:Set(...)
+	FLOAT_PRECISION = ...
 end
 
--- Assuming getscriptbytecode returns the bytecode for the given script
-local bytecode = getscriptbytecode(s)
 
--- Now process the bytecode
-processBytecode(bytecode)
+return Read
