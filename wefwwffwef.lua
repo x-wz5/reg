@@ -54,7 +54,8 @@ function Read.new(bytecode)
 				break
 			end
 		end
-	end
+  end
+
 		function self:nextString(len)
 		len = len or self:nextVarInt()
 		if len == 0 then
@@ -71,9 +72,6 @@ function Read.new(bytecode)
 		cursor += 8
 		return result
 	end
-	
-		return result
-  end
 
 
   return self
