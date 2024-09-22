@@ -41,10 +41,10 @@ function Read.new(bytecode)
     return res
   end
   function self:readFloat()
-    local res = buffer.readu32(stream,cursor)
+    local res = buffer.readu32(stream, cursor)
     cursor = cursor + 4
-    return tonumber(string.format(`%0.{FLOAT_PRECISION}f`, res))
-  end
+    return tonumber(string.format("%0." .. FLOAT_PRECISION .. "f", res))
+end
   function self:nextVarInt()
 		local result = 0
 		for i = 0, 4 do
