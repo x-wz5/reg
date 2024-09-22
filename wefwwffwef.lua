@@ -78,7 +78,7 @@ function Read.new(bytecode)
   return self
 end
 
-function Reader:Set(...)
+function Read:Set(...)
 	FLOAT_PRECISION = ...
 end
 
