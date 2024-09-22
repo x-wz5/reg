@@ -43,5 +43,7 @@ function cFlow.new(bytecode)
     end
     return result
   end
-  
+  return self
 end
+
+return cFlow
