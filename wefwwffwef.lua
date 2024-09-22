@@ -35,7 +35,7 @@ function Read.new(bytecode)
     cursor = cursor + 4
     return res
   end
-  function self:readUInt32()
+  function self:readInt32()
     local res = buffer.readi32(stream,cursor)
     cursor = cursor + 4
     return res
@@ -43,7 +43,7 @@ function Read.new(bytecode)
   function self:readFloat()
     local res = buffer.readu32(stream,cursor)
     cursor = cursor + 4
-    return tonumber(string.format(`%0.{FLOAT_PRECISION}f`, result))
+    return tonumber(string.format(`%0.{FLOAT_PRECISION}f`, res))
   end
   function self:nextVarInt()
 		local result = 0
@@ -54,6 +54,7 @@ function Read.new(bytecode)
 				break
 			end
 		end
+	end
 		function self:nextString(len)
 		len = len or self:nextVarInt()
 		if len == 0 then
