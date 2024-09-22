@@ -46,15 +46,16 @@ function Read.new(bytecode)
     return tonumber(string.format("%0." .. FLOAT_PRECISION .. "f", res))
 end
   function self:nextVarInt()
-		local result = 0
-		for i = 0, 4 do
-			local b = self:nextByte()
-			result = bit32.bor(result, bit32.lshift(bit32.band(b, 0x7F), i * 7))
-			if not bit32.btest(b, 0x80) then
-				break
-			end
-		end
-  end
+    local result = 0
+    for i = 0, 4 do
+        local b = self:nextByte()
+        result = bit32.bor(result, bit32.lshift(bit32.band(b, 0x7F), i * 7))
+        if not bit32.btest(b, 0x80) then
+            break
+        end
+    end
+    return result  -- Ensure to return the result
+end
 
 		function self:nextString(len)
 		len = len or self:nextVarInt()
