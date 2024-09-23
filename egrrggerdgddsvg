@@ -3,12 +3,12 @@ local disassembly = {}
 local ReadScript = game:HttpGet("https://raw.githubusercontent.com/x-wz5/reg/refs/heads/main/wefwwffwef.lua")
 local Read = loadstring(ReadScript)()
 
-local opcodeScript = game:HttpGet("https://raw.githubusercontent.com/x-wz5/reg/refs/heads/main/idk")
-local opcodeLoad = loadstring(opcodeScript)()
+local opcodeHttp = game:HttpGet("https://raw.githubusercontent.com/x-wz5/reg/refs/heads/main/idk")
+local opcode = loadstring(opcodeHttp)()
 
 function disassembly.new(bytecode)
     local Reader = Read.new(bytecode)
-    local opcode = opcodeLoad.new()
+    local opcodeInstance = opcode.new()
     local opcodeMap = opcode.map
     print(opcodeMap)
     local self = {}
@@ -21,7 +21,7 @@ function disassembly.new(bytecode)
             local byte = Reader:nextByte()
             local success,opcodeMapR = pcall(function() return opcodeMap[byte]end)
             if success then
-                local byteArgs = opcode:getArg(byte)
+                local byteArgs = opcodeInstance:getArg(byte)
                 local arg = Reader:nextArg(byteArgs)
                 warn(byteArgs,arg,opcodeMapR)
                 -- Fix: Use correct reference to `opcodeMap`
