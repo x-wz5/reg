@@ -25,7 +25,7 @@ function disassembly.new(bytecode)
                 local arg = Reader:nextArg(byteArgs)
                 warn(byteArgs,arg,opcodeMapR)
                 -- Fix: Use correct reference to `opcodeMap`
-                result = result .. opcodeMapR .. "  " .. arg .. "\n"
+                result = result .. tostring(opcodeMapR) .. "  " .. tostring(arg) .. "\n"
             else
               
                 result = result .. ""
