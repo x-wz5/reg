@@ -3,7 +3,7 @@ local disassembly = {}
 local ReadScript = game:HttpGet("https://raw.githubusercontent.com/x-wz5/reg/refs/heads/main/wefwwffwef.lua")
 local Read = loadstring(ReadScript)()
 
-local opcodeScript = game:HttpGet("")
+local opcodeScript = game:HttpGet("https://raw.githubusercontent.com/x-wz5/reg/refs/heads/main/idk f")
 local Luauopcode = loadstring(opcodeScript)()
 
 function disassembly.new(bytecode)
