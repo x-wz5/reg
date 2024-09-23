@@ -78,7 +78,9 @@ end
 	function self:nextArg(range)
     range = range or 0
     local args = self:nextBytes(range)
-
+    if args == 0 then
+      return ""
+    end
     if #args == 0 then
         return ""  -- Return empty string if no bytes
     end
