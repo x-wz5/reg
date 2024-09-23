@@ -10,6 +10,7 @@ function disassembly.new(bytecode)
     local Reader = Read.new(bytecode)
     local opcode = opcode.new()
     local opcodeMap = opcode.map
+    print(opcodeMap)
     local self = {}
     
     function self:disassembly()
@@ -22,10 +23,11 @@ function disassembly.new(bytecode)
             if success then
                 local byteArgs = opcode:getArg(byte)
                 local arg = Reader:nextArg(byteArgs)
-                
+                warn(byteArgs,arg,opcodeMapR)
                 -- Fix: Use correct reference to `opcodeMap`
                 result = result .. opcodeMapR .. "  " .. arg .. "\n"
             else
+              print("No sucess")
                 result = result .. "\n"
             end
         end
