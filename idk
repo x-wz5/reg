@@ -175,10 +175,10 @@ function opcode.new()
   local self = {}
   
   function self:getArg(byte)
-    return opcode.Args[byte]
+    return opcode.Args[byte] or ""
   end
   function self:getOpcode(byte)
-    return opcode.map[byte]
+    return opcode.map[byte] or ""
   end
   return self
 end
