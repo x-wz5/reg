@@ -1,226 +1,186 @@
-local Decompile, Libraries = {
-  WaitDecompile = false,
-  getupvalues = false,
-  getconstants = false,
-  setclipboard = true
-}, {
-  "bit32",
-  "buffer",
-  "coroutine",
-  "debug",
-  "math",
-  "os",
-  "string",
-  "table",
-  "task",
-  "utf8"
+local opcode = {}
+opcode.map = {
+    [1] = "LOP_NOP",
+    [2] = "LOP_BREAK",
+    [3] = "LOP_LOADNIL",
+    [4] = "LOP_LOADB",
+    [5] = "LOP_LOADN",
+    [6] = "LOP_LOADK",
+    [7] = "LOP_MOVE",
+    [8] = "LOP_GETGLOBAL",
+    [9] = "LOP_SETGLOBAL",
+    [10] = "LOP_GETUPVAL",
+    [11] = "LOP_SETUPVAL",
+    [12] = "LOP_CLOSEUPVALS",
+    [13] = "LOP_GETIMPORT",
+    [14] = "LOP_GETTABLE",
+    [15] = "LOP_SETTABLE",
+    [16] = "LOP_GETTABLEKS",
+    [17] = "LOP_SETTABLEKS",
+    [18] = "LOP_GETTABLEN",
+    [19] = "LOP_SETTABLEN",
+    [20] = "LOP_NEWCLOSURE",
+    [21] = "LOP_NAMECALL",
+    [22] = "LOP_CALL",
+    [23] = "LOP_RETURN",
+    [24] = "LOP_JUMP",
+    [25] = "LOP_JUMPBACK",
+    [26] = "LOP_JUMPIF",
+    [27] = "LOP_JUMPIFNOT",
+    [28] = "LOP_JUMPIFEQ",
+    [29] = "LOP_JUMPIFLE",
+    [30] = "LOP_JUMPIFLT",
+    [31] = "LOP_JUMPIFNOTEQ",
+    [32] = "LOP_JUMPIFNOTLE",
+    [33] = "LOP_JUMPIFNOTLT",
+    [34] = "LOP_ADD",
+    [35] = "LOP_SUB",
+    [36] = "LOP_MUL",
+    [37] = "LOP_DIV",
+    [38] = "LOP_MOD",
+    [39] = "LOP_POW",
+    [40] = "LOP_ADDK",
+    [41] = "LOP_SUBK",
+    [42] = "LOP_MULK",
+    [43] = "LOP_DIVK",
+    [44] = "LOP_MODK",
+    [45] = "LOP_POWK",
+    [46] = "LOP_AND",
+    [47] = "LOP_OR",
+    [48] = "LOP_ANDK",
+    [49] = "LOP_ORK",
+    [50] = "LOP_CONCAT",
+    [51] = "LOP_NOT",
+    [52] = "LOP_MINUS",
+    [53] = "LOP_LENGTH",
+    [54] = "LOP_NEWTABLE",
+    [55] = "LOP_DUPTABLE",
+    [56] = "LOP_SETLIST",
+    [57] = "LOP_FORNPREP",
+    [58] = "LOP_FORNLOOP",
+    [59] = "LOP_FORGLOOP",
+    [60] = "LOP_FORGPREP_INEXT",
+    [61] = "LOP_FASTCALL3",
+    [62] = "LOP_FORGPREP_NEXT",
+    [63] = "LOP_NATIVECALL",
+    [64] = "LOP_GETVARARGS",
+    [65] = "LOP_DUPCLOSURE",
+    [66] = "LOP_PREPVARARGS",
+    [67] = "LOP_LOADKX",
+    [68] = "LOP_JUMPX",
+    [69] = "LOP_FASTCALL",
+    [70] = "LOP_COVERAGE",
+    [71] = "LOP_CAPTURE",
+    [72] = "LOP_SUBRK",
+    [73] = "LOP_DIVRK",
+    [74] = "LOP_FASTCALL1",
+    [75] = "LOP_FASTCALL2",
+    [76] = "LOP_FASTCALL2K",
+    [77] = "LOP_FORGPREP",
+    [78] = "LOP_JUMPXEQKNIL",
+    [79] = "LOP_JUMPXEQKB",
+    [80] = "LOP_JUMPXEQKN",
+    [81] = "LOP_JUMPXEQKS",
+    [82] = "LOP_IDIV",
+    [83] = "LOP_IDIVK",
+    [84] = "LOP__COUNT"
+  }
+opcode.Args = {
+    [1] = 0,   -- LOP_NOP
+    [2] = 0,   -- LOP_BREAK
+    [3] = 1,   -- LOP_LOADNIL
+    [4] = 2,   -- LOP_LOADB
+    [5] = 2,   -- LOP_LOADN
+    [6] = 2,   -- LOP_LOADK
+    [7] = 2,   -- LOP_MOVE
+    [8] = 2,   -- LOP_GETGLOBAL
+    [9] = 2,   -- LOP_SETGLOBAL
+    [10] = 2,  -- LOP_GETUPVAL
+    [11] = 2,  -- LOP_SETUPVAL
+    [12] = 1,  -- LOP_CLOSEUPVALS
+    [13] = 2,  -- LOP_GETIMPORT
+    [14] = 3,  -- LOP_GETTABLE
+    [15] = 3,  -- LOP_SETTABLE
+    [16] = 3,  -- LOP_GETTABLEKS
+    [17] = 3,  -- LOP_SETTABLEKS
+    [18] = 3,  -- LOP_GETTABLEN
+    [19] = 3,  -- LOP_SETTABLEN
+    [20] = 1,  -- LOP_NEWCLOSURE
+    [21] = 2,  -- LOP_NAMECALL
+    [22] = 3,  -- LOP_CALL
+    [23] = 2,  -- LOP_RETURN
+    [24] = 1,  -- LOP_JUMP
+    [25] = 1,  -- LOP_JUMPBACK
+    [26] = 2,  -- LOP_JUMPIF
+    [27] = 2,  -- LOP_JUMPIFNOT
+    [28] = 3,  -- LOP_JUMPIFEQ
+    [29] = 3,  -- LOP_JUMPIFLE
+    [30] = 3,  -- LOP_JUMPIFLT
+    [31] = 3,  -- LOP_JUMPIFNOTEQ
+    [32] = 3,  -- LOP_JUMPIFNOTLE
+    [33] = 3,  -- LOP_JUMPIFNOTLT
+    [34] = 3,  -- LOP_ADD
+    [35] = 3,  -- LOP_SUB
+    [36] = 3,  -- LOP_MUL
+    [37] = 3,  -- LOP_DIV
+    [38] = 3,  -- LOP_MOD
+    [39] = 3,  -- LOP_POW
+    [40] = 3,  -- LOP_ADDK
+    [41] = 3,  -- LOP_SUBK
+    [42] = 3,  -- LOP_MULK
+    [43] = 3,  -- LOP_DIVK
+    [44] = 3,  -- LOP_MODK
+    [45] = 3,  -- LOP_POWK
+    [46] = 3,  -- LOP_AND
+    [47] = 3,  -- LOP_OR
+    [48] = 3,  -- LOP_ANDK
+    [49] = 3,  -- LOP_ORK
+    [50] = 2,  -- LOP_CONCAT
+    [51] = 2,  -- LOP_NOT
+    [52] = 2,  -- LOP_MINUS
+    [53] = 2,  -- LOP_LENGTH
+    [54] = 2,  -- LOP_NEWTABLE
+    [55] = 1,  -- LOP_DUPTABLE
+    [56] = 3,  -- LOP_SETLIST
+    [57] = 2,  -- LOP_FORNPREP
+    [58] = 2,  -- LOP_FORNLOOP
+    [59] = 2,  -- LOP_FORGLOOP
+    [60] = 2,  -- LOP_FORGPREP_INEXT
+    [61] = 3,  -- LOP_FASTCALL3
+    [62] = 2,  -- LOP_FORGPREP_NEXT
+    [63] = 1,  -- LOP_NATIVECALL
+    [64] = 1,  -- LOP_GETVARARGS
+    [65] = 1,  -- LOP_DUPCLOSURE
+    [66] = 1,  -- LOP_PREPVARARGS
+    [67] = 1,  -- LOP_LOADKX
+    [68] = 1,  -- LOP_JUMPX
+    [69] = 1,  -- LOP_FASTCALL
+    [70] = 1,  -- LOP_COVERAGE
+    [71] = 1,  -- LOP_CAPTURE
+    [72] = 3,  -- LOP_SUBRK
+    [73] = 3,  -- LOP_DIVRK
+    [74] = 2,  -- LOP_FASTCALL1
+    [75] = 2,  -- LOP_FASTCALL2
+    [76] = 2,  -- LOP_FASTCALL2K
+    [77] = 2,  -- LOP_FORGPREP
+    [78] = 2,  -- LOP_JUMPXEQKNIL
+    [79] = 2,  -- LOP_JUMPXEQKB
+    [80] = 2,  -- LOP_JUMPXEQKN
+    [81] = 2,  -- LOP_JUMPXEQKS
+    [82] = 3,  -- LOP_IDIV
+    [83] = 3,  -- LOP_IDIVK
+    [84] = 0   -- LOP__COUNT (no args, just a terminator)
 }
-
-
-
-local function Wait()
-    if Decompile.WaitDecompile then
-        task.wait()
-    end
+function opcode.new()
+  local self = {}
+  
+  function self:getArg(byte)
+    return opcode.Args[byte]
+  end
+  function self:getOpcode(byte)
+    return opcode.map[byte]
+  end
+  return self
 end
 
-local function IsValidVariableName(name)
-    -- Check if the variable name is valid (i.e., doesn't contain spaces, numbers, etc.)
-    return not name:find("[^%a_]")
-end
-
-local function GetParams(func)
-    local Info, Vals = debug.getinfo(func), {}
-    for ind = 1, Info.numparams do
-        table.insert(Vals, "Val" .. tostring(ind))
-    end
-    if Info.is_vararg > 0 then
-        table.insert(Vals, "...")
-    end
-    return table.concat(Vals, ", ")
-end
-
-local function GetIndex(Index)
-    if tostring(Index):len() < 1 or Index:find("[ %d%+%-%/|]") ~= nil then
-        return "[\"" .. tostring(Index) .. "\"]"
-    elseif tonumber(Index) then
-        return "[" .. tostring(Index) .. "]"
-    else
-        return tostring(Index)
-    end
-end
-
-local function DecompileTable(tab, Lines)
-    local Script = "{"
-    local IsFirst = true
-    for key, value in pairs(tab) do
-        if IsFirst then
-            IsFirst = false
-        else
-            Script = Script .. ","
-        end
-        Script = Script .. "\n" .. Lines .. "  " .. GetIndex(key) .. " = " .. Decompile:Type(value, Lines .. "  ")
-    end
-    return Script .. (not IsFirst and "\n" .. Lines or "") .. "}"
-end
-
-local function DecompileInstance(part, Lines)
-    local firstName, Variavel2 = "", ""
-    local Separator = part:GetFullName():split(".")
-    for _, b in pairs(Separator) do
-        if not firstName then
-            local var = b:gsub(" ", "")
-            if not game:FindFirstChild(var) then
-                return var .. " --[[ nil Instance ]]"
-            elseif var == "Workspace" then
-                firstName = "workspace"
-            else
-                firstName = var
-                table.insert(Variables, var)
-            end
-        else
-            if b == Player.Name and firstName == "Players" then
-                Variavel2 = Variavel2 .. ".LocalPlayer"
-            elseif b == Player.Name and firstName == "workspace" then
-                table.insert(Variables, "Players")
-                Variavel2, firstName = "Players.LocalPlayer.Character", ""
-            elseif b == "Camera" and firstName == "workspace" then
-                Variavel2 = Variavel2 .. ".CurrentCamera"
-            elseif IsValidVariableName(b) then
-                Variavel2 = Variavel2 .. "." .. b
-            else
-                Variavel2 = Variavel2 .. '["' .. b .. '"]'
-            end
-        end
-    end
-    return firstName .. Variavel2
-end
-
-function Decompile:Type(part, Lines)
-    Wait()
-    local type = typeof(part)
-    local Script = ""
-
-    if type == "boolean" then
-        Script = Script .. tostring(part)
-    elseif type == "nil" then
-        Script = Script .. "nil"
-    elseif type == "table" then
-        Script = Script .. DecompileTable(part, Lines)
-    elseif type == "string" then
-        Script = Script .. '"' .. part .. '"'
-    elseif type == "Instance" then
-        Script = Script .. DecompileInstance(part, Lines)
-    elseif type == "function" then
-        Script = Script .. "function(" .. GetParams(part) .. ")"
-        local HaveVal, constants, upvalues = false, "", ""
-        
-        if Decompile.getupvalues then
-            local uptable = getupvalues and getupvalues(part)
-            
-            if uptable and typeof(uptable) == "table" and #uptable > 0 then
-                upvalues, HaveVal = upvalues .. "\n" .. Lines .. "  local upvalues = {", true
-                for ind, val in pairs(uptable) do
-                    upvalues = upvalues .. "\n" .. Lines .. "    [" .. tostring(ind) .. "] = " .. Decompile:Type(val, Lines .. "    ")
-                end
-                upvalues = upvalues .. "\n" .. Lines .. "  }"
-            end
-        end
-        if Decompile.getconstants then
-            local uptable = getconstants and getconstants(part)
-            
-            if uptable and typeof(uptable) == "table" and #uptable > 0 then
-                constants, HaveVal = constants .. "\n" .. Lines .. "  local constants = {", true
-                for ind, val in pairs(uptable) do
-                    constants = constants .. "\n" .. Lines .. "    [" .. tostring(ind) .. "] = " .. Decompile:Type(val, Lines .. "    ")
-                end
-                constants = constants .. "\n" .. Lines .. "  }"
-            end
-        end
-        
-        local endType = HaveVal and "\n" .. Lines .. "end" or "end"
-        Script = Script .. upvalues .. constants .. endType
-    elseif type == "CFrame" then
-        Script = Script .. "CFrame.new(" .. tostring(part) .. ")"
-    elseif type == "Color3" then
-        Script = Script .. "Color3.fromRGB(" .. GetColorRGB(part) .. ")"
-    elseif type == "BrickColor" then
-        Script = Script .. 'BrickColor.new("' .. tostring(part) .. '")'
-    elseif type == "Vector2" then
-        Script = Script .. "Vector2.new(" .. tostring(part) .. ")"
-    elseif type == "Vector3" then
-        Script = Script .. "Vector3.new(" .. tostring(part) .. ")"
-    elseif type == "UDim" then
-        Script = Script .. "UDim.new(" .. tostring(part) .. ")"
-    elseif type == "UDim2" then
-        Script = Script .. "UDim2.new(" .. tostring(part) .. ")"
-    elseif type == "TweenInfo" then
-        Script = Script .. "TweenInfo.new(" .. tostring(part) .. ")"
-    elseif type == "Axes" then
-        Script = Script .. "Axes.new(" .. tostring(part) .. ")"
-    else
-        Script = Script .. tostring(part)
-    end
-    return Script
-end
-
-function Decompile.new(part)
-    local Metodo
-    Variables = {}
-    local function GetClass(partGet)
-        if typeof(partGet) == "Instance" then
-            if partGet:IsA("LocalScript") then
-                Metodo = "getsenv"
-                return getsenv(partGet)
-            elseif partGet:IsA("ModuleScript") then
-                local Script = require(partGet)
-                Metodo = "require"
-                if typeof(Script) == "function" then
-                    Metodo = Metodo .. ", getupvalues"
-                    return getupvalues(Script)
-                end
-                return Script
-            end
-        end
-        return partGet
-    end
-    
-    local Script, Lines, IsFirst = typeof(part) == "Instance" and "%slocal Script = " .. Decompile:Type(part) .. "\n\n" or "", "  "
-    Script = Script .. "local Decompile = {"
-    
-    local PartClass = GetClass(part)
-    if typeof(PartClass) == "table" then
-        for a, b in pairs(PartClass) do
-            if IsFirst then
-                Script = Script .. ","
-            end
-            Script = Script .. "\n"
-            Script = Script .. Lines .. GetIndex(a) .. ' = '
-            Script = Script .. Decompile:Type(b, Lines)
-            IsFirst = true
-        end
-    else
-        Script = Script .. "\n" .. Lines .. "[\"1\"] = " .. Decompile:Type(PartClass, Lines)
-    end
-    
-    if Metodo then
-        Script = Script:format("local Method = " .. Metodo .. "\n")
-    else
-        Script = Script:format("")
-    end
-    
-    local Var, list = "", {}
-    for _, Val in ipairs(Variables) do
-        if not table.find(list, Val) then
-            Var = Var .. "local " .. Val .. "\ = game:GetService(\"" .. Val .. "\")\n"
-            table.insert(list, Val)
-        end
-    end
-    
-    if Decompile.setclipboard then
-        setclipboard(Var .. "\n" .. Script .. "\n}")
-    end
-    return (Var .. "\n" .. Script .. "\n}")
-end
-
-return Decompile
+return opcode
