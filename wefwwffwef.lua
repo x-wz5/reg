@@ -79,7 +79,7 @@ end
     range = range or 0
     local result = {}  
     local args = self:nextBytes(range)  
-
+    if typeof(args) ~= "table" then return "" end
     for _, v in ipairs(args) do
         table.insert(result, v)
     end
