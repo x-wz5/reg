@@ -22,14 +22,14 @@ local opc = {
 function cFlow.new(bytecode)
     local Reader = Read.new(bytecode)
     local self = {}
-
+    local cursor = getconstant(Reader,3)
     function self:getAllIf()  -- Corrected function name
         local result = ""
-        while Reader.cursor < Reader:len() do
+        while cursor < Reader:len() do
             local byte = Reader:nextByte()
 
             if opc[byte] then  -- Simplified check using the opc table
-                result = result .. tostring(opc[byte]) .. "\n"
+                result = result .. opc[byte] .. "\n"
             end
         end
         return result
