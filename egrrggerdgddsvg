@@ -4,11 +4,11 @@ local ReadScript = game:HttpGet("https://raw.githubusercontent.com/x-wz5/reg/ref
 local Read = loadstring(ReadScript)()
 
 local opcodeScript = game:HttpGet("https://raw.githubusercontent.com/x-wz5/reg/refs/heads/main/idk")
-local opcode = loadstring(opcodeScript)()
+local opcodeLoad = loadstring(opcodeScript)()
 
 function disassembly.new(bytecode)
     local Reader = Read.new(bytecode)
-    local opcode = opcode.new()
+    local opcode = opcodeLoad.new()
     local opcodeMap = opcode.map
     print(opcodeMap)
     local self = {}
