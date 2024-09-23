@@ -29,7 +29,7 @@ function cFlow.new(bytecode)
             local byte = Reader:nextByte()
 
             if opc[byte] then  -- Simplified check using the opc table
-                result = result .. opc[byte] .. "\n"
+                result = result .. tostring(opc[byte]) .. "\n"
             end
         end
         return result
