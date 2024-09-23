@@ -89,23 +89,32 @@ local opc = {
     [83] = "LOP_IDIVK",
     [84] = "LOP__COUNT"
   }
-
+local ifOpc = {
+  [26] = "JMP",        -- Unconditional jump
+[27] = "JMPIF",      -- Jump if true (conditional)
+[28] = "JMPNOT",     -- Jump if false (conditional)
+[29] = "TEST",       -- Conditional check (used for if-like statements)
+[30] = "TESTSET",    -- Conditional check and assignment
+[31] = "EQ",         -- Equality check
+[32] = "LT",         -- Less than check
+[33] = "LE",         -- Less than or equal to check
+}
 function cFlow.new(bytecode)
     local Reader = Read.new(bytecode)
     local self = {}
     
-    function self:getNextIf(range)
+    function self:getNextIf()
         local result = ""
-        for i = 0, range do
+        
+        while true do
             local byte = Reader:nextByte()
-            if opc[byte] then
-                result = result .. opc[byte] .. "\n"
-                
+            if ifOpc[byte] then
+                result = result .. opc[byte] .."  "..Reader:nextArgument(2) "\n"
+                break
             else
-                result = result.. "\n" -- Return empty if no valid opcode found
+                result = result.. "\n"
             end
-            
-        end
+          end
         return result
     end
 
