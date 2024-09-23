@@ -18,21 +18,15 @@ function disassembly.new(bytecode)
         -- Fix: Ensure we iterate until the cursor reaches the end of the bytecode
         while Reader.cursor < Reader:len() do
             local byte = Reader:nextByte()
-            
-            -- Check if the byte exists in opcodeMap
-            if opcodeMap[byte] then
-                -- Get the argument count or pattern associated with the byte
+            local success,opcodeMapR = pcall(function() return opcodeMap[byte]end)
+            if success then
                 local byteArgs = opcode:getArg(byte)
+                local arg = Reader:nextArg(byteArgs)
                 
-                -- Ensure byteArgs is valid (could be 0 if no args are required)
-                if byteArgs then
-                    local arg = Reader:nextArg(byteArgs)
-                    result = result .. opcodeMap[byte] .. "  " .. arg .. "\n"
-                else
-                    result = result .. opcodeMap[byte] .. "  <No Args>\n"
-                end
+                -- Fix: Use correct reference to `opcodeMap`
+                result = result .. opcodeMapR .. "  " .. arg .. "\n"
             else
-                result = result .. "Unknown byte: " .. tostring(byte) .. "\n"
+                result = result .. "\n"
             end
         end
         return result
