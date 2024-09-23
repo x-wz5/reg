@@ -79,11 +79,12 @@ end
     range = range or 0
     local result = {}  
     local args = self:nextBytes(range)  
-    if typeof(args) ~= "table" then return "" end
+    if type(args) == "table" then 
     for _, v in ipairs(args) do
         table.insert(result, v)
     end
-
+    else return ""
+    end
     return table.concat(result,", ")
   end
 
