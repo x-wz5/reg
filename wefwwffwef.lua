@@ -5,15 +5,14 @@ local FLOAT_PRECISION = 24
 function Read.new(bytecode)
   local self = {}
   local stream = buffer.fromstring(bytecode)
-  local cursor = 0
-  
+  self.cursor = 0
   function self:len()
     return buffer.len(stream)
   end
   
   function self:nextByte()
-    local result = buffer.readu8(stream, cursor)
-    cursor = cursor + 1
+    local result = buffer.readu8(stream, self.cursor)
+    self.cursor = self.cursor + 1
     return result
   end
 
@@ -30,18 +29,18 @@ function Read.new(bytecode)
   end
   
   function self:readUInt32()
-    local res = buffer.readu32(stream,cursor)
-    cursor = cursor + 4
+    local res = buffer.readu32(stream,self.cursor)
+    self.cursor = self.cursor + 4
     return res
   end
   function self:readInt32()
-    local res = buffer.readi32(stream,cursor)
-    cursor = cursor + 4
+    local res = buffer.readi32(stream,self.cursor)
+    self.cursor = self.cursor + 4
     return res
   end
   function self:readFloat()
-    local res = buffer.readu32(stream, cursor)
-    cursor = cursor + 4
+    local res = buffer.readf32(stream, self.cursor)
+    self.cursor = self.cursor + 4
     return tonumber(string.format("%0." .. FLOAT_PRECISION .. "f", res))
 end
   function self:nextVarInt()
@@ -62,18 +61,18 @@ end
 			return ""
 		else
 		  len = len or self:nextVarInt()
-			local result = buffer.readstring(stream, cursor, len)
-			cursor = cursor + len
+			local result = buffer.readstring(stream, self.cursor, len)
+			self.cursor = self.cursor + len
 			return result
 		end
 	end
 
 	function self:nextDouble()
-		local result = buffer.readf64(stream, cursor)
-		cursor = cursor + 8
+		local result = buffer.readf64(stream, self.cursor)
+		self.cursor = self.cursor + 8
 		return result
 	end
-	function self:nextArgument(range)
+	function self:nextArg(range)
     range = range or 1
     local result = {}  
     local args = self:nextBytes(range)  
@@ -83,7 +82,7 @@ end
     end
 
     return table.concat(result,", ")
-end
+  end
 
   return self
 end
