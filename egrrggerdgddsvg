@@ -4,28 +4,30 @@ local ReadScript = game:HttpGet("https://raw.githubusercontent.com/x-wz5/reg/ref
 local Read = loadstring(ReadScript)()
 
 local opcodeScript = game:HttpGet("https://raw.githubusercontent.com/x-wz5/reg/refs/heads/main/idk")
-local Luauopcode = loadstring(opcodeScript)()
+local opcode = loadstring(opcodeScript)()
 
 function disassembly.new(bytecode)
     local Reader = Read.new(bytecode)
-    local opcode = Luauopcode.new()
-    local opcodeMap = Luauopcode.map
+    local opcode = opcode.new()
+    local opcodeMap = opcode.map
     local self = {}
     
     function self:disassembly()
         local result = ""
         
-        while true do
+        -- Fix: Ensure we iterate until the cursor reaches the end of the bytecode
+        while Reader.cursor < Reader:len() do
             local byte = Reader:nextByte()
             if opcodeMap[byte] then
-              local byteArgs = opcode:getArg(byte)
-              local arg = Reader:nextArg(byteArgs)
-                result = result .. opc[byte] .."  "..arg.."\n"
-                break
+                local byteArgs = opcode:getArg(byte)
+                local arg = Reader:nextArg(byteArgs)
+                
+                -- Fix: Use correct reference to `opcodeMap`
+                result = result .. opcodeMap[byte] .. "  " .. arg .. "\n"
             else
-                result = result.. "\n"
+                result = result .. "\n"
             end
-          end
+        end
         return result
     end
 
