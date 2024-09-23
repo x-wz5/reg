@@ -25,7 +25,7 @@ function cFlow.new(bytecode)
     
     function self:getNextIf(range)
         local result = ""
-        for i = 0, i < range do
+        for i = 0, range do
             local byte = Reader:nextByte()
             if opc[byte] then
                 result = result .. opc[byte] .. "\n"
@@ -33,7 +33,7 @@ function cFlow.new(bytecode)
             else
                 result = result.. "\n" -- Return empty if no valid opcode found
             end
-            i = i + 1
+            
         end
         return result
     end
