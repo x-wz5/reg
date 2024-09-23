@@ -178,7 +178,7 @@ function opcode.new()
     return opcode.Args[byte] or 0
   end
   function self:getOpcode(byte)
-    return opcode.map[byte] ""
+    return opcode.map[byte] or ""
   end
   return self
 end
