@@ -8,21 +8,27 @@ local opcode = loadstring(opcodeScript)()
 
 function disassembly.new(bytecode)
     local Reader = Read.new(bytecode)
-    local opcodeInstance = opcode.new()
-    local opcodeMap = opcodeInstance.map
+    local opcode = opcode.new()
+    local opcodeMap = opcode.map
+    print(opcodeMap)
     local self = {}
     
     function self:disassembly()
         local result = ""
+        
+        -- Fix: Ensure we iterate until the cursor reaches the end of the bytecode
         while Reader.cursor < Reader:len() do
             local byte = Reader:nextByte()
-            local byteArgs = opcodeInstance:getArg(byte)
-            local opcodeName = opcodeInstance:getOpcode(byte)
-            if opcodeName then
+            local success,opcodeMapR = pcall(function() return opcodeMap[byte]end)
+            if success then
+                local byteArgs = opcode:getArg(byte)
                 local arg = Reader:nextArg(byteArgs)
-                result = result .. opcodeName .. "  " .. arg .. "\n"
+                warn(byteArgs,arg,opcodeMapR)
+                -- Fix: Use correct reference to `opcodeMap`
+                result = result .. opcodeMapR .. "  " .. arg .. "\n"
             else
-                result = result .. "Unknown opcode: " .. byte .. "\n"
+              
+                result = result .. ""
             end
         end
         return result
