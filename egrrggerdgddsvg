@@ -29,12 +29,13 @@ function cFlow.new(bytecode)
             local byte = Reader:nextByte()
             if opc[byte] then
                 result = result .. opc[byte] .. "\n"
-                return result
+                
             else
                 result = result.. "\n" -- Return empty if no valid opcode found
             end
             i = i + 1
         end
+        return result
     end
 
     return self
