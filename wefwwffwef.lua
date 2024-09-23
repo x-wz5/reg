@@ -1,7 +1,6 @@
 local Read = {}
 local FLOAT_PRECISION = 24
 
-Read.__index = Read
 
 function Read.new(bytecode)
   local self = {}
@@ -55,7 +54,7 @@ end
         end
     end
     return result  -- Ensure to return the result
-end
+  end
 
 		function self:nextString(len)
 		len = len or self:nextVarInt()
@@ -71,10 +70,20 @@ end
 
 	function self:nextDouble()
 		local result = buffer.readf64(stream, cursor)
-		cursor += 8
+		cursor = cursor + 8
 		return result
 	end
+	function self:nextArgument(range)
+    range = range or 1
+    local result = {}  
+    local args = self:nextBytes(range)  
 
+    for _, v in ipairs(args) do
+        table.insert(result, v)
+    end
+
+    return table.concat(result,", ")
+end
 
   return self
 end
