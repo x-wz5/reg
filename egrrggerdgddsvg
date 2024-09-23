@@ -23,17 +23,18 @@ function cFlow.new(bytecode)
     local Reader = Read.new(bytecode)
     local self = {}
     local i = 0
-    function self:getAllIf()  -- Corrected function name
+    
+    function self:getNextIf()
         local result = ""
-        while i < Reader:len() do
+        while true do
             local byte = Reader:nextByte()
-
-            if opc[byte] then  -- Simplified check using the opc table
+            if opc[byte] then
                 result = result .. opc[byte] .. "\n"
+                return result
+            else
+                return "" -- Return empty if no valid opcode found
             end
-            i = i + 1
         end
-        return result
     end
 
     return self
