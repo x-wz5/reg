@@ -77,15 +77,13 @@ end
 	end
 	function self:nextArg(range)
     range = range or 0
-    local result = {}  
-    local args = self:nextBytes(range)  
-    if type(args) == "table" then 
-    for _, v in ipairs(args) do
-        table.insert(result, v)
+    local args = self:nextBytes(range)
+
+    if #args == 0 then
+        return ""  -- Return empty string if no bytes
     end
-    else return ""
-    end
-    return table.concat(result,", ")
+
+    return table.concat(args, ", ")
   end
 
   return self
