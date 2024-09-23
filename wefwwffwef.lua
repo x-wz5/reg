@@ -17,7 +17,9 @@ function Read.new(bytecode)
   end
 
   function self:nextBytes(count)
-    if count == 0 then return end
+    if count == 0 then
+      return 0x0
+    end
     local bytes = {}
     for j = 1, count do
       table.insert(bytes, self:nextByte())
