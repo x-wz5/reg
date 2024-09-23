@@ -108,8 +108,9 @@ function cFlow.new(bytecode)
         
         while true do
             local byte = Reader:nextByte()
+            
             if ifOpc[byte] then
-                result = result .. opc[byte] .."  "..Reader:nextArgument(2) "\n"
+                result = result .. opc[byte] .."  "..Reader:nextArgument(2).."\n"
                 break
             else
                 result = result.. "\n"
