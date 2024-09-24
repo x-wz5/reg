@@ -1,224 +1,554 @@
-local Decompile, Libraries = {
-  WaitDecompile = false,
-  getupvalues = false,
-  getconstants = false,
-  setclipboard = true
-}, {
-  "bit32",
-  "buffer",
-  "coroutine",
-  "debug",
-  "math",
-  "os",
-  "string",
-  "table",
-  "task",
-  "utf8"
+local Players = game:GetService("Players")
+local plr = Players.LocalPlayer
+local char = plr.Character
+local TweenService = game:GetService("TweenService")
+
+-- Player variables: Player mouse, Character, speed
+local Mouse = plr:GetMouse()
+local Character = plr.Character
+
+
+local TweenStyle = TweenInfo.new(0.30,Enum.EasingStyle.Exponential)
+
+
+--
+local CoreUi = game:GetService("CoreGui")
+
+if CoreUi:FindFirstChild("Quake Hub") then
+  CoreUi["Quake Hub"]:Destroy()
+end
+
+local nightModeColors = {
+ BackGroundColor = Color3.fromRGB(15 ,15,15),
+ MainFrameColor = Color3.fromRGB(27,27,27),
+ ButtonsColor = Color3.fromRGB(47,47,47),
+ ToggleColor = Color3.fromRGB(57,57,57)
+}
+local LightModeColors = {
+ BackGroundColor = Color3.fromRGB(225 ,225,325),
+ MainFrameColor = Color3.fromRGB(220,220,220),
+ ButtonsColor = Color3.fromRGB(230,230,230),
+ ToggleColor = Color3.fromRGB(247,247,247)
 }
 
-local Variables = {}
-local Players = game:GetService("Players")
-local Player = Players.LocalPlayer
+local Sizes = {
+  Buttons = UDim2.new(1,0,0.12,0),
+  Sliders = UDim2.new(1,0,0.13,0),
+  Toggles = UDim2.new(1,0,0.125,0),
+  DropDowns = UDim2.new(1,0,0.15,0)
+}
 
-local function Wait()
-  if Decompile.WaitDecompile then
-    task.wait()
-  end
-end
 
-local function IsInvalid(str)
-  return str:find("[ %d%+%-%/|]") ~= nil
-end
 
-local function GetParams(func)
-  local Info, Vals = debug.getinfo(func), {}
-  for ind = 1, Info.numparams do
-    table.insert(Vals, "Val" .. tostring(ind))
-  end
-  if Info.is_vararg > 0 then
-    table.insert(Vals, "...")
-  end
-  return table.concat(Vals, ", ")
-end
+local Window = {}
+local Buttons = {}
+local Tab = {}
+local Tabs = {}
+local Toggle = {}
+local Sliders = {}
+local Labels = {}
+local Notify = {}
+local DropDown = {}
+local DropDownObject = {}
+local NightMode = true
 
-local function GetColorRGB(Color)
-  local R, G, B = math.floor(Color.R * 255), math.floor(Color.G * 255), math.floor(Color.B * 255)
-  return R .. ", " .. G .. ", " .. B
-end
+Window.__index = Window
+Buttons.__index = Buttons
+Tab.__index = Tab
+Sliders.__index = Sliders
+Labels.__index = Labels
+Toggle.__index = Toggle
+Notify.__index = Notify
+DropDown.__index = DropDown
+DropDownObject.__index = DropDownObject
 
-local function GetIndex(Index)
-  if tostring(Index):len() < 1 or IsInvalid(tostring(Index)) then
-    return "[\"" .. tostring(Index) .. "\"]"
-  elseif tonumber(Index) then
-    return "[" .. tostring(Index) .. "]"
-  else
-    return tostring(Index)
-  end
-end
+function ChangeMode()
+    local modeColors = NightMode and nightModeColors or LightModeColors
 
-function Decompile:Type(part, Lines)
-  Wait()
-  local type = typeof(part)
-  local Script = ""
+    for _, v in pairs(Tabs) do
+        if v.Name == "Main" then
+            v.Parent.BackgroundColor3 = modeColors.BackGroundColor
+            v.BackgroundColor3 = modeColors.MainFrameColor
+            v.Parent.TabHandler.BackgroundColor3 = modeColors.MainFrameColor
 
-  if type == "boolean" then
-    Script = Script .. tostring(part)
-  elseif type == "nil" then
-    Script = Script .. "nil"
-  elseif type == "table" then
-    Script = Script .. "{"
-    local IsFirst = false
-    for a, b in pairs(part) do
-      if IsFirst then
-        Script = Script .. ","
-      end
-      Script = Script .. "\n" .. Lines .. "  " .. GetIndex(a) .. " = "
-      Script = Script .. Decompile:Type(b, Lines .. "  ")
-      IsFirst = true
-    end
-    Script = Script .. (IsFirst and "\n" .. Lines or "") .. "}"
-  elseif type == "string" then
-    Script = Script .. '"' .. part .. '"'
-  elseif type == "Instance" then
-    local firstName, Variavel2 = "", ""
-    local Separator = part:GetFullName():split(".")
-    for _, b in pairs(Separator) do
-      if not firstName then
-        local var = b:gsub(" ", "")
-        if not game:FindFirstChild(var) then
-          return var .. " --[[ nil Instance ]]"
-        elseif var == "Workspace" then
-          firstName = "workspace"
-        else
-          firstName = var
-          table.insert(Variables, var)
+            for _, child in pairs(v.Parent.TabHandler:GetChildren()) do
+                if child.Name == "b" then
+                    child.BackgroundColor3 = modeColors.ButtonsColor
+                
+                end
+            end
+
+            for _, element in pairs(v:GetDescendants()) do
+                if element:IsA("TextButton") or element:IsA("TextLabel") then
+                    element.BackgroundColor3 = modeColors.ButtonsColor
+                    local dropDownFrame = element:FindFirstChild("Drop Down Frame")
+                    if dropDownFrame then
+                        dropDownFrame.BackgroundColor3 = modeColors.MainFrameColor
+                    end
+                end
+            end
         end
+    end
+end
+
+
+
+function TweenColor(Color,Object,Style)
+  local Tween = TweenService:Create(Object, Style or TweenStyle, {
+    BackgroundColor3 = Color
+})
+Tween:Play()
+end
+
+function Window.new(data)
+local self = setmetatable({},Window)
+
+self.Sg = Instance.new("ScreenGui")
+self.Frame = Instance.new("Frame")
+self.Shadow = Instance.new("ImageLabel")
+self.Corner = Instance.new("UICorner")
+self.Corner2 = Instance.new("UICorner")
+self.Corner3 = Instance.new("UICorner")
+self.Corner4 = Instance.new("UICorner")
+self.title = Instance.new("TextLabel")
+self.TabHandler = Instance.new("Frame")
+self.List = Instance.new("UIListLayout")
+self.List2 = Instance.new("UIListLayout")
+self.Border = Instance.new("UIStroke")
+self.Border2 = Instance.new("UIStroke")
+self.Apear = Instance.new("ImageButton")
+self.Close = Instance.new("TextButton")
+self.SelectedTab = Instance.new("Frame")
+
+self.Sg.Parent = CoreUi
+self.Frame.Parent = self.Sg
+self.Corner.Parent = self.Frame
+self.Corner2.Parent = self.TabHandler
+self.Corner3.Parent = self.Close
+self.title.Parent = self.Frame
+self.TabHandler.Parent = self.Frame
+self.Shadow.Parent = self.Frame
+self.Apear.Parent = self.Frame
+self.Close.Parent = self.Sg
+self.SelectedTab.Parent = self.Frame
+
+self.Sg.Name = "Quake Hub"
+
+self.Frame.Size = UDim2.new(0.55, 0, 0.60, 0)
+self.Frame.Position = UDim2.new(0, 0.5, 0, 0.5)
+self.Frame.Active = true
+self.Frame.Draggable = true
+self.Frame.Name = "Main Frame"
+
+self.title.BackgroundTransparency = 1
+self.title.Text = data.Name
+self.title.Font = Enum.Font.DenkOne
+self.title.TextSize = 14
+self.title.TextColor3 = Color3.new(35,35,35)
+self.title.Position = UDim2.new(0.1,0,0.94,0)
+self.title.ZIndex = 99
+
+self.Corner.CornerRadius = UDim.new(0, 6)
+self.Corner2.CornerRadius = UDim.new(0, 6)
+self.Corner2.CornerRadius = UDim.new(0,6)
+
+self.TabHandler.Size = UDim2.new(0.20, 0, 1, 0)
+self.TabHandler.Name = "TabHandler"
+
+self.List.Parent = self.TabHandler
+self.List.Padding = UDim.new(0.025,0)
+
+self.List2.Parent = self.TabFrame
+self.List2.Padding = UDim.new(0.01,0)
+
+self.Border.Parent = self.Frame
+self.Border.Thickness = 2.5
+
+self.Border2.Parent = self.TabHandler
+self.Border2.Thickness = 2.5
+
+self.Shadow.Size = UDim2.new(2,0,2,0)
+self.Shadow.ZIndex = -1
+self.Shadow.Image = "rbxassetid://18810622958"
+self.Shadow.ImageTransparency = 0
+self.Shadow.BackgroundTransparency = 1
+self.Shadow.Position = UDim2.new(-0.5,0,-0.5,0)
+
+self.Apear.Size = UDim2.new(0.06,0,0.1,0)
+self.Apear.Position = UDim2.new(0,0,0.8,0)
+self.Apear.Image = "rbxassetid://18812208598"
+self.Apear.BackgroundTransparency = 1
+self.Apear.ZIndex = 999
+
+self.Close.Size = UDim2.new(0.07,0,0.07,0)
+self.Close.Position = UDim2.new(0.478,0,0.05,0)
+self.Close.BackgroundColor3 = Color3.fromRGB(239, 68, 35)
+self.Close.TextSize = 14
+self.Close.Font = Enum.Font.DenkOne
+self.Close.ZIndex = math.huge
+self.Close.Text = "X"
+
+self.Apear.MouseButton1Click:Connect(function()
+  NightMode = not NightMode
+  ChangeMode()
+  if NightMode == false then
+    self.Apear.Image = "rbxassetid://18829428142"
+    else
+      self.Apear.Image = "rbxassetid://18812208598"
+    end
+end)
+
+self.Close.MouseButton1Click:Connect(function() 
+  self.Close.Parent["Main Frame"].Visible = not self.Close.Parent["Main Frame"].Visible
+  if self.Close.Parent["Main Frame"].Visible then
+    self.Close.Text = "X"
+    else
+      self.Close.Text = "+"
+    end
+end)
+self.SelectedTab.Size = UDim2.new(0.01,0,0.07,0)
+self.SelectedTab.BackgroundColor3 = Color3.fromRGB(0,170,255)
+self.SelectedTab.Position = UDim2.new(0.01,0,0.01,0)
+
+self.Corner4.Parent = self.SelectedTab
+self.Corner4.CornerRadius = UDim.new(0,6)
+return self
+end
+
+local myWindow = Window.new({Name = "Quake hub: Blox Fruit"})
+
+function self:NewTab(data)
+  
+local self = setmetatable({},Tab)
+
+self.List2 = Instance.new("UIListLayout")
+self.TabBtn = Instance.new("TextButton")
+self.Corner = Instance.new("UICorner")
+self.Corner2 = Instance.new("UICorner")
+self.TabFrame = Instance.new("ScrollingFrame")
+
+self.Corner.Parent = self.TabBtn
+self.Corner2.Parent = self.TabFrame
+
+self.Corner.CornerRadius = UDim.new(0, 6)
+self.Corner2.CornerRadius = UDim.new(0, 6)
+
+self.TabBtn.Size = UDim2.new(1, 0, 0.1, 0)
+self.TabBtn.BackgroundTransparency = 0
+self.TabBtn.Text = data.Name
+self.TabBtn.Font = Enum.Font.DenkOne
+self.TabBtn.Parent = myWindow.TabHandler
+self.TabBtn.TextColor3 = Color3.fromRGB(0,0,0)
+self.TabBtn.TextSize = 14
+self.TabBtn.Name = "b"
+
+
+self.TabFrame.Parent = myWindow.Frame
+self.TabFrame.Size = UDim2.new(0.79,0,0.979,0)
+self.TabFrame.Position = UDim2.new(0.21,0,0.01,0)
+self.TabFrame.Visible = false
+self.TabFrame.Name = "Main"
+self.TabFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+self.TabFrame.ScrollBarThickness = 0.1
+self.TabFrame.BackgroundTransparency = 1
+self.TabFrame.CanvasSize = UDim2.new(0,0,0,0)
+
+self.List2.Parent = self.TabFrame
+self.List2.Padding = UDim.new(0.01,0)
+
+local t = self.TabBtn.BackgroundColor3
+Tabs[data.Name] = self.TabFrame
+local yPos = self.TabBtn.AbsolutePosition.Y
+self.TabBtn.MouseButton1Click:Connect(function()
+  
+  local Tween = TweenService:Create(myWindow.SelectedTab, TweenInfo.new(0.5,Enum.EasingStyle.Exponential), {
+    Position = UDim2.new(0.01,0,0,yPos + 3)
+})
+
+Tween:Play()
+for k,v in pairs(Tabs) do
+  if k ~= data.Name then
+    v.Visible = false
+    for _,Child in next,v.Parent.TabHandler:GetChildren() do
+      if Child:IsA("TextButton") and Child.Name == "b" then
+      if NightMode then
+      Child.BackgroundColor3 = nightModeColors.ButtonsColor
       else
-        if b == Player.Name and firstName == "Players" then
-          Variavel2 = Variavel2 .. ".LocalPlayer"
-        elseif b == Player.Name and firstName == "workspace" then
-          table.insert(Variables, "Players")
-          Variavel2, firstName = "Players.LocalPlayer.Character", ""
-        elseif b == "Camera" and firstName == "workspace" then
-          Variavel2 = Variavel2 .. ".CurrentCamera"
-        elseif IsInvalid(b) then
-          Variavel2 = Variavel2 .. '["' .. b .. '"]'
-        else
-          Variavel2 = Variavel2 .. "." .. b
-        end
+        Child.BackgroundColor3 = LightModeColors.ButtonsColor
       end
-    end
-    Script = Script .. firstName .. Variavel2
-  elseif type == "function" then
-    Script = Script .. "function(" .. GetParams(part) .. ")"
-    local HaveVal, constants, upvalues = false, "", ""
-    
-    if Decompile.getupvalues then
-      local uptable = getupvalues and getupvalues(part)
+      end
+      end
+    elseif k == data.Name then
+      v.Visible = true
+      if NightMode then
+      local oldColorNight = nightModeColors.ButtonsColor
+      local newR = math.clamp(oldColorNight.R + 20, 0, 255)
+      local newG = math.clamp(oldColorNight.G + 20, 0, 255)
+      local newB = math.clamp(oldColorNight.B + 20, 0, 255)
+      TweenColor(Color3.new(newR / 255, newG / 255, newB / 255),self.TabBtn,TweenInfo.new(0.2,Enum.EasingStyle.Linear))
+      else
+      local oldColorLight = LightModeColors.ButtonsColor
+      local newRLight = math.clamp(oldColorLight.R +15, 0, 255)
+      local newGLight= math.clamp(oldColorLight.G +15, 0, 255)
+      local newBLight = math.clamp(oldColorLight.B + 15, 0, 255)
+      TweenColor(Color3.new(newRLight, newGLight, newBLight),self.TabBtn,TweenInfo.new(0.2,Enum.EasingStyle.Linear))
       
-      if uptable and typeof(uptable) == "table" and #uptable > 0 then
-        upvalues, HaveVal = upvalues .. "\n" .. Lines .. "  local upvalues = {", true
-        for ind, val in pairs(uptable) do
-          upvalues = upvalues .. "\n" .. Lines .. "    [" .. tostring(ind) .. "] = " .. Decompile:Type(val, Lines .. "    ")
-        end
-        upvalues = upvalues .. "\n" .. Lines .. "  }"
       end
-    end
-    if Decompile.getconstants then
-      local uptable = getconstants and getconstants(part)
-      
-      if uptable and typeof(uptable) == "table" and #uptable > 0 then
-        constants, HaveVal = constants .. "\n" .. Lines .. "  local constants = {", true
-        for ind, val in pairs(uptable) do
-          constants = constants .. "\n" .. Lines .. "    [" .. tostring(ind) .. "] = " .. Decompile:Type(val, Lines .. "    ")
-        end
-        constants = constants .. "\n" .. Lines .. "  }"
-      end
-    end
-    
-    local endType = HaveVal and "\n" .. Lines .. "end" or "end"
-    Script = Script .. upvalues .. constants .. endType
-  elseif type == "CFrame" then
-    Script = Script .. "CFrame.new(" .. tostring(part) .. ")"
-  elseif type == "Color3" then
-    Script = Script .. "Color3.fromRGB(" .. GetColorRGB(part) .. ")"
-  elseif type == "BrickColor" then
-    Script = Script .. 'BrickColor.new("' .. tostring(part) .. '")'
-  elseif type == "Vector2" then
-    Script = Script .. "Vector2.new(" .. tostring(part) .. ")"
-  elseif type == "Vector3" then
-    Script = Script .. "Vector3.new(" .. tostring(part) .. ")"
-  elseif type == "UDim" then
-    Script = Script .. "UDim.new(" .. tostring(part) .. ")"
-  elseif type == "UDim2" then
-    Script = Script .. "UDim2.new(" .. tostring(part) .. ")"
-  elseif type == "TweenInfo" then
-    Script = Script .. "TweenInfo.new(" .. tostring(part) .. ")"
-  elseif type == "Axes" then
-    Script = Script .. "Axes.new(" .. tostring(part) .. ")"
-  else
-    Script = Script .. tostring(part)
   end
-  return Script
+end
+end)
+function self:NewButton(data)
+local button = setmetatable({},Buttons)
+
+button.button = Instance.new("TextButton")
+button.Corner = Instance.new("UICorner")
+
+button.button.Parent = self.TabFrame
+button.button.Text = data.Name
+button.button.Font = Enum.Font.DenkOne
+button.button.Size = Sizes.Buttons
+button.button.Position = UDim2.new(0.5,0,0.5,0)
+button.button.TextColor3 = Color3.new(0,0,0)
+button.button.TextSize = 14
+button.button.Name = "a"
+button.button.ZIndex = 999
+
+button.Corner.Parent = button.button
+button.Corner.CornerRadius = UDim.new(0,6)
+
+button.button.BackgroundColor3 = Color3.fromRGB(47,47,47)
+
+button.button.MouseButton1Click:Connect(function() 
+data.Callback()
+   end)
+   
+   
+   return button
+end
+function self:NewToggle(data)
+local toggle = setmetatable({},Toggle)
+
+toggle.button = Instance.new("TextButton")
+toggle.Corner = Instance.new("UICorner")
+toggle.Corner2 = Instance.new("UICorner")
+toggle.Corner3 = Instance.new("UICorner")
+toggle.Toggle = Instance.new("Frame")
+
+toggle.button.Parent = self.TabFrame
+toggle.button.Text = data.Name
+toggle.button.Font = Enum.Font.DenkOne
+toggle.button.Size = Sizes.Toggles
+toggle.button.Position = UDim2.new(0.5,0,0.5,0)
+toggle.button.TextColor3 = Color3.fromRGB(0,0,0)
+toggle.button.TextSize = 14
+toggle.button.Name = "a"
+
+toggle.Toggle.Parent = toggle.button
+toggle.Toggle.Size = UDim2.new(0.05,0,0.7,0)
+toggle.Toggle.Position = UDim2.new(0.93,0,0.179,0)
+
+toggle.Corner.Parent = toggle.button
+toggle.Corner.CornerRadius = UDim.new(0,6)
+
+
+ 
+toggle.Corner3.Parent = toggle.Toggle
+toggle.Corner3.CornerRadius = UDim.new(9,9)
+
+toggle.button.MouseButton1Click:Connect(function()
+  data.Value = not data.Value
+  if data.Value == false then
+    toggle.Toggle.BackgroundColor3 = Color3.fromRGB(64,64,64)
+    else
+      toggle.Toggle.BackgroundColor3 = Color3.fromRGB(75, 151, 75)
+  end
+  
+    data.Callback(data.Value)
+    
+end)
+   return toggle
+  end
+function self:NewSlider(data)
+    local slider = setmetatable({},Sliders)
+    slider.Slider = Instance.new("Frame")
+    slider.Fill = Instance.new("Frame")
+    slider.Trigger = Instance.new("TextButton")
+    slider.Display = Instance.new("TextLabel")
+    slider.outputValue = 0.5
+    slider.Corner = Instance.new("UICorner")
+    slider.Corner2 = Instance.new("UICorner")
+    slider.sliderActive = false
+    
+    slider.Slider.Parent = self.TabFrame
+    slider.Slider.Size = Sizes.Sliders
+    slider.Slider.Name = "a"
+    slider.Slider.BackgroundTransparency = 1
+    
+    slider.Corner.Parent = slider.Slider
+    slider.Corner.CornerRadius = UDim.new(0, 6)
+    
+    slider.Corner2.Parent = slider.Fill
+    slider.Corner2.CornerRadius = UDim.new(0, 6)
+    
+    slider.Fill.Parent = slider.Slider
+    slider.Fill.Size = UDim2.new(slider.outputValue/2, 0, 1, 0)
+    slider.Fill.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+    
+    slider.Trigger.Parent = slider.Slider
+    slider.Trigger.BackgroundTransparency = 1
+    slider.Trigger.Text = ""
+    slider.Trigger.Size = UDim2.new(1, 0, 1, 0)
+    slider.Trigger.MouseButton1Down:Connect(function()
+        slider:ActivateSlider() -- Use instance-specific method
+    end)
+    
+    slider.Display.AnchorPoint = Vector2.new(0, 0.5)
+    slider.Display.BackgroundTransparency = 1
+    slider.Display.Position = UDim2.new(0, 0, 0.5, 0)
+    slider.Display.Size = UDim2.new(1, 0, 0.5, 0)
+    slider.Display.Parent = slider.Slider
+    slider.Display.Text = data.Name.." "..tostring(data.Start)
+    slider.Display.TextSize = 14
+    slider.Display.Font = Enum.Font.DenkOne
+    slider.Display.TextColor3 = Color3.fromRGB(0,0,0)
+    
+    game:GetService("UserInputService").InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            slider.sliderActive = false
+        end
+    end)
+    
+    function slider:UpdateSlider()
+        slider.output = math.clamp((Mouse.X - slider.Slider.AbsolutePosition.X) / slider.Slider.AbsoluteSize.X, 0, 1)
+        data.Callback(math.round(slider.output * data.Max))
+        if slider.outputValue ~= slider.output then
+          
+            TweenService:Create(slider.Fill, TweenInfo.new(0.2), { Size = UDim2.new(slider.output, 0, 1, 0) }):Play()
+        end
+        slider.outputValue = slider.output
+        slider.Display.Text = data.Name.." "..tostring(math.round(slider.output * data.Max))
+    end
+
+    function slider:ActivateSlider()
+        slider.sliderActive = true
+        while slider.sliderActive do
+            wait()
+            slider:UpdateSlider()
+        end
+    end
+    
+    return slider
 end
 
-function Decompile.new(part)
-  local Metodo
-  Variables = {}
-  local function GetClass(partGet)
-    if typeof(partGet) == "Instance" then
-      if partGet:IsA("LocalScript") then
-        Metodo = "getsenv"
-        return getsenv(partGet)
-      elseif partGet:IsA("ModuleScript") then
-        local Script = require(partGet)
-        Metodo = "require"
-        if typeof(Script) == "function" then
-          Metodo = Metodo .. ", getupvalues"
-          return getupvalues(Script)
-        end
-        return Script
+function self:NewSection(data)
+  
+local section = setmetatable({},Labels)
+section.label = Instance.new("TextLabel")
+section.Corner = Instance.new("UICorner")
+
+section.label.Parent = self.TabFrame
+section.label.Text = data.Name
+section.label.Font = Enum.Font.DenkOne
+section.label.Size = UDim2.new(1, 0, 0.12, 0)
+section.label.Position = UDim2.new(0.5,0,0.5,0)
+section.label.TextSize = 14
+section.label.Name = "a"
+section.label.BackgroundTransparency = 1
+section.Corner.Parent = section.label
+section.Corner.CornerRadius = UDim.new(0,6)
+
+   return section
+end
+function self:NewDropDown(data)
+  local dropdown = setmetatable({},DropDown)
+  
+  dropdown.DropDownBtn = Instance.new("TextButton")
+  dropdown.DropDownFrame = Instance.new("ScrollingFrame")
+  dropdown.DropDownText = Instance.new("TextLabel")
+  dropdown.List = Instance.new("UIListLayout")
+  dropdown.Corner = Instance.new("UICorner")
+  dropdown.Corner2 = Instance.new("UICorner")
+  
+  dropdown.DropDownBtn.Parent = self.TabFrame
+  dropdown.DropDownFrame.Parent = dropdown.DropDownBtn
+  dropdown.DropDownText.Parent = dropdown.DropDownBtn
+  
+  dropdown.DropDownBtn.Size = Sizes.DropDowns
+  dropdown.DropDownBtn.Font = Enum.Font.DenkOne
+  dropdown.DropDownBtn.Font = Enum.Font.DenkOne
+  dropdown.DropDownBtn.TextSize = 14
+  dropdown.DropDownBtn.TextColor3 = Color3.fromRGB(0,0,0)
+  
+  dropdown.DropDownFrame.Size = UDim2.new(0.3,0,0,0)
+  dropdown.DropDownFrame.Position = UDim2.new(0.7,0,1,0)
+  dropdown.DropDownFrame.ZIndex = 9999
+  dropdown.DropDownFrame.Visible = false
+  dropdown.DropDownFrame.Name = "Drop Down Frame"
+  
+  dropdown.DropDownText.Size = UDim2.new(0.3,0,1,0)
+  dropdown.DropDownText.BackgroundTransparency = 1
+  dropdown.DropDownText.Text = data.Name
+  dropdown.DropDownText.Font = Enum.Font.DenkOne
+  dropdown.DropDownText.TextSize = 14
+  dropdown.DropDownText.TextColor3 = Color3.fromRGB(0,0,0)
+  
+  dropdown.Corner.Parent = dropdown.DropDownBtn
+  dropdown.Corner.CornerRadius = UDim.new(0,6)
+  
+  dropdown.Corner2.Parent = dropdown.DropDownFrame
+  dropdown.Corner2.CornerRadius = UDim.new(0,6)
+  
+  dropdown.List.Parent = dropdown.DropDownFrame
+  
+  local close = TweenService:Create(dropdown.DropDownFrame,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{Size = UDim2.new(0.3,0,0,0)})
+  local open = TweenService:Create(dropdown.DropDownFrame,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{Size = UDim2.new(0.3,0,0,200)})
+  local Opened = false
+  dropdown.DropDownBtn.MouseButton1Click:Connect(function()
+      if Opened then
+          close:Play()
+          Opened = false
+          wait(0.3)
+          dropdown.DropDownFrame.Visible = false
+      else
+        dropdown.DropDownFrame.Visible = true
+          open:Play()
+          Opened = true
+          
       end
-    end
-    return partGet
-  end
+  end)
+  function dropdown:NewObject(data2)
+  local DropDownObject = setmetatable({},DropDownObject)
   
-  local Script, Lines, IsFirst = typeof(part) == "Instance" and "%slocal Script = " .. Decompile:Type(part) .. "\n\n" or "", "  "
-  Script = Script .. "local Decompile = {"
+  DropDownObject.button = Instance.new("TextButton")
+  DropDownObject.corner = Instance.new("UICorner")
   
-  local PartClass = GetClass(part)
-  if typeof(PartClass) == "table" then
-    for a, b in pairs(PartClass) do
-      if IsFirst then
-        Script = Script .. ","
-      end
-      Script = Script .. "\n"
-      Script = Script .. Lines .. GetIndex(a) .. ' = '
-      Script = Script .. Decompile:Type(b, Lines)
-      IsFirst = true
-    end
-  else
-    Script = Script .. "\n" .. Lines .. "[\"1\"] = " .. Decompile:Type(PartClass, Lines)
-  end
+  DropDownObject.button.Parent = dropdown.DropDownFrame
+  DropDownObject.button.Size = UDim2.new(1,0,0.1,0)
+  DropDownObject.button.BackgroundColor3 = Color3.fromRGB(0,0,0)
+  DropDownObject.button.ZIndex = 99999
+  DropDownObject.button.Text = data2.Name
+  DropDownObject.button.Font = Enum.Font.DenkOne
+  DropDownObject.button.TextSize = 14
+  DropDownObject.button.TextColor3 = Color3.fromRGB(0,0,0)
   
-  if Metodo then
-    Script = Script:format("local Method = " .. Metodo .. "\n")
-  else
-    Script = Script:format("")
-  end
+  DropDownObject.corner.Parent = DropDownObject.button
+  DropDownObject.corner.CornerRadius = UDim.new(0,6)
   
-  local Var, list = "", {}
-  for _, Val in ipairs(Variables) do
-    if not table.find(list, Val) then
-      Var = Var .. "local " .. Val .. "\ = game:GetService(\"" .. Val .. "\")\n"
-      table.insert(list, Val)
-    end
-  end
+  DropDownObject.button.MouseButton1Click:Connect(function()
+      close:Play()
+      dropdown.DropDownText.Text = DropDownObject.button.Text
+      Opened = false
+      data.Callback(dropdown.DropDownText.Text)
+      wait(0.3)
+      dropdown.DropDownFrame.Visible = false
+    end)
   
-  if Decompile.setclipboard then
-    setclipboard(Var .. "\n" .. Script .. "\n}")
-  end
-  return (Var .. "\n" .. Script .. "\n}")
+  return DropDownObject
+end
+  return dropdown
 end
 
-return Decompile
+return self
+-- end of the function
+end
+return Window
