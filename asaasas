@@ -212,10 +212,9 @@ self.SelectedTab.Position = UDim2.new(0.01,0,0.01,0)
 
 self.Corner4.Parent = self.SelectedTab
 self.Corner4.CornerRadius = UDim.new(0,6)
-return self
-end
 
-local myWindow = Window.new({Name = "Quake hub: Blox Fruit"})
+
+
 
 function self:NewTab(data)
   
@@ -548,6 +547,9 @@ end
   return dropdown
 end
 
+return self
+
+end
 return self
 -- end of the function
 end
