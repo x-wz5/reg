@@ -25,7 +25,7 @@ local nightModeColors = {
  ToggleColor = Color3.fromRGB(57,57,57)
 }
 local LightModeColors = {
- BackGroundColor = Color3.fromRGB(225 ,225,325),
+ BackGroundColor = Color3.fromRGB(225 ,225,225),
  MainFrameColor = Color3.fromRGB(220,220,220),
  ButtonsColor = Color3.fromRGB(230,230,230),
  ToggleColor = Color3.fromRGB(247,247,247)
@@ -42,25 +42,24 @@ local Sizes = {
 
 local Window = {}
 local Buttons = {}
-local Tab = {}
 local Tabs = {}
 local Toggle = {}
 local Sliders = {}
 local Labels = {}
 local Notify = {}
 local DropDown = {}
-local DropDownObject = {}
+local self = {}
 local NightMode = true
 
 Window.__index = Window
 Buttons.__index = Buttons
-Tab.__index = Tab
+Tabs.__index = Tabs
 Sliders.__index = Sliders
 Labels.__index = Labels
 Toggle.__index = Toggle
 Notify.__index = Notify
 DropDown.__index = DropDown
-DropDownObject.__index = DropDownObject
+self.__index = self
 
 function ChangeMode()
     local modeColors = NightMode and nightModeColors or LightModeColors
@@ -101,166 +100,165 @@ Tween:Play()
 end
 
 function Window.new(data)
-local Window = setmetatable({},Window)
+local self = setmetatable({},Window)
 
-Window.Sg = Instance.new("ScreenGui")
-Window.Frame = Instance.new("Frame")
-Window.Shadow = Instance.new("ImageLabel")
-Window.Corner = Instance.new("UICorner")
-Window.Corner2 = Instance.new("UICorner")
-Window.Corner3 = Instance.new("UICorner")
-Window.Corner4 = Instance.new("UICorner")
-Window.title = Instance.new("TextLabel")
-Window.TabHandler = Instance.new("Frame")
-Window.List = Instance.new("UIListLayout")
-Window.List2 = Instance.new("UIListLayout")
-Window.Border = Instance.new("UIStroke")
-Window.Border2 = Instance.new("UIStroke")
-Window.Apear = Instance.new("ImageButton")
-Window.Close = Instance.new("TextButton")
-Window.SelectedTab = Instance.new("Frame")
+self.Sg = Instance.new("ScreenGui")
+self.Frame = Instance.new("Frame")
+self.Shadow = Instance.new("ImageLabel")
+self.Corner = Instance.new("UICorner")
+self.Corner2 = Instance.new("UICorner")
+self.Corner3 = Instance.new("UICorner")
+self.Corner4 = Instance.new("UICorner")
+self.title = Instance.new("TextLabel")
+self.TabHandler = Instance.new("Frame")
+self.List = Instance.new("UIListLayout")
+self.List2 = Instance.new("UIListLayout")
+self.Border = Instance.new("UIStroke")
+self.Border2 = Instance.new("UIStroke")
+self.Apear = Instance.new("ImageButton")
+self.Close = Instance.new("TextButton")
+self.SelectedTab = Instance.new("Frame")
 
-Window.Sg.Parent = CoreUi
-Window.Frame.Parent = Window.Sg
-Window.Corner.Parent = Window.Frame
-Window.Corner2.Parent = Window.TabHandler
-Window.Corner3.Parent = Window.Close
-Window.title.Parent = Window.Frame
-Window.TabHandler.Parent = Window.Frame
-Window.Shadow.Parent = Window.Frame
-Window.Apear.Parent = Window.Frame
-Window.Close.Parent = Window.Sg
-Window.SelectedTab.Parent = Window.Frame
+self.Sg.Parent = CoreUi
+self.Frame.Parent = self.Sg
+self.Corner.Parent = self.Frame
+self.Corner2.Parent = self.TabHandler
+self.Corner3.Parent = self.Close
+self.title.Parent = self.Frame
+self.TabHandler.Parent = self.Frame
+self.Shadow.Parent = self.Frame
+self.Apear.Parent = self.Frame
+self.Close.Parent = self.Sg
+self.SelectedTab.Parent = self.Frame
 
-Window.Sg.Name = "Quake Hub"
+self.Sg.Name = "Quake Hub"
 
-Window.Frame.Size = UDim2.new(0.55, 0, 0.60, 0)
-Window.Frame.Position = UDim2.new(0, 0.5, 0, 0.5)
-Window.Frame.Active = true
-Window.Frame.Draggable = true
-Window.Frame.Name = "Main Frame"
+self.Frame.Size = UDim2.new(0.55, 0, 0.60, 0)
+self.Frame.Position = UDim2.new(0, 0.5, 0, 0.5)
+self.Frame.Active = true
+self.Frame.Draggable = true
+self.Frame.Name = "Main Frame"
 
-Window.title.BackgroundTransparency = 1
-Window.title.Text = data.Name
-Window.title.Font = Enum.Font.DenkOne
-Window.title.TextSize = 14
-Window.title.TextColor3 = Color3.new(35,35,35)
-Window.title.Position = UDim2.new(0.1,0,0.94,0)
-Window.title.ZIndex = 99
+self.title.BackgroundTransparency = 1
+self.title.Text = data.Name
+self.title.Font = Enum.Font.DenkOne
+self.title.TextSize = 14
+self.title.TextColor3 = Color3.new(35,35,35)
+self.title.Position = UDim2.new(0.1,0,0.94,0)
+self.title.ZIndex = 99
 
-Window.Corner.CornerRadius = UDim.new(0, 6)
-Window.Corner2.CornerRadius = UDim.new(0, 6)
-Window.Corner2.CornerRadius = UDim.new(0,6)
+self.Corner.CornerRadius = UDim.new(0, 6)
+self.Corner2.CornerRadius = UDim.new(0, 6)
+self.Corner2.CornerRadius = UDim.new(0,6)
 
-Window.TabHandler.Size = UDim2.new(0.20, 0, 1, 0)
-Window.TabHandler.Name = "TabHandler"
+self.TabHandler.Size = UDim2.new(0.20, 0, 1, 0)
+self.TabHandler.Name = "TabHandler"
 
-Window.List.Parent = Window.TabHandler
-Window.List.Padding = UDim.new(0.025,0)
+self.List.Parent = self.TabHandler
+self.List.Padding = UDim.new(0.025,0)
 
-Window.List2.Parent = Window.TabFrame
-Window.List2.Padding = UDim.new(0.01,0)
+self.List2.Parent = self.TabFrame
+self.List2.Padding = UDim.new(0.01,0)
 
-Window.Border.Parent = Window.Frame
-Window.Border.Thickness = 2.5
+self.Border.Parent = self.Frame
+self.Border.Thickness = 2.5
 
-Window.Border2.Parent = Window.TabHandler
-Window.Border2.Thickness = 2.5
+self.Border2.Parent = self.TabHandler
+self.Border2.Thickness = 2.5
 
-Window.Shadow.Size = UDim2.new(2,0,2,0)
-Window.Shadow.ZIndex = -1
-Window.Shadow.Image = "rbxassetid://18810622958"
-Window.Shadow.ImageTransparency = 0
-Window.Shadow.BackgroundTransparency = 1
-Window.Shadow.Position = UDim2.new(-0.5,0,-0.5,0)
+self.Shadow.Size = UDim2.new(2,0,2,0)
+self.Shadow.ZIndex = -1
+self.Shadow.Image = "rbxassetid://18810622958"
+self.Shadow.ImageTransparency = 0
+self.Shadow.BackgroundTransparency = 1
+self.Shadow.Position = UDim2.new(-0.5,0,-0.5,0)
 
-Window.Apear.Size = UDim2.new(0.06,0,0.1,0)
-Window.Apear.Position = UDim2.new(0,0,0.8,0)
-Window.Apear.Image = "rbxassetid://18812208598"
-Window.Apear.BackgroundTransparency = 1
-Window.Apear.ZIndex = 999
+self.Apear.Size = UDim2.new(0.06,0,0.1,0)
+self.Apear.Position = UDim2.new(0,0,0.8,0)
+self.Apear.Image = "rbxassetid://18812208598"
+self.Apear.BackgroundTransparency = 1
+self.Apear.ZIndex = 999
 
-Window.Close.Size = UDim2.new(0.07,0,0.07,0)
-Window.Close.Position = UDim2.new(0.478,0,0.05,0)
-Window.Close.BackgroundColor3 = Color3.fromRGB(239, 68, 35)
-Window.Close.TextSize = 14
-Window.Close.Font = Enum.Font.DenkOne
-Window.Close.ZIndex = math.huge
-Window.Close.Text = "X"
+self.Close.Size = UDim2.new(0.07,0,0.07,0)
+self.Close.Position = UDim2.new(0.478,0,0.05,0)
+self.Close.BackgroundColor3 = Color3.fromRGB(239, 68, 35)
+self.Close.TextSize = 14
+self.Close.Font = Enum.Font.DenkOne
+self.Close.ZIndex = math.huge
+self.Close.Text = "X"
 
-Window.Apear.MouseButton1Click:Connect(function()
+self.Apear.MouseButton1Click:Connect(function()
   NightMode = not NightMode
   ChangeMode()
   if NightMode == false then
-    Window.Apear.Image = "rbxassetid://18829428142"
+    self.Apear.Image = "rbxassetid://18829428142"
     else
-      Window.Apear.Image = "rbxassetid://18812208598"
+      self.Apear.Image = "rbxassetid://18812208598"
     end
 end)
 
-Window.Close.MouseButton1Click:Connect(function() 
-  Window.Close.Parent["Main Frame"].Visible = not Window.Close.Parent["Main Frame"].Visible
-  if Window.Close.Parent["Main Frame"].Visible then
-    Window.Close.Text = "X"
+self.Close.MouseButton1Click:Connect(function() 
+  self.Close.Parent["Main Frame"].Visible = not self.Close.Parent["Main Frame"].Visible
+  if self.Close.Parent["Main Frame"].Visible then
+    self.Close.Text = "X"
     else
-      Window.Close.Text = "+"
+      self.Close.Text = "+"
     end
 end)
-Window.SelectedTab.Size = UDim2.new(0.01,0,0.07,0)
-Window.SelectedTab.BackgroundColor3 = Color3.fromRGB(0,170,255)
-Window.SelectedTab.Position = UDim2.new(0.01,0,0.01,0)
+self.SelectedTab.Size = UDim2.new(0.01,0,0.07,0)
+self.SelectedTab.BackgroundColor3 = Color3.fromRGB(0,170,255)
+self.SelectedTab.Position = UDim2.new(0.01,0,0.01,0)
 
-Window.Corner4.Parent = Window.SelectedTab
-Window.Corner4.CornerRadius = UDim.new(0,6)
-
-
+self.Corner4.Parent = self.SelectedTab
+self.Corner4.CornerRadius = UDim.new(0,6)
 
 
-function Window:NewTab(data)
+
+
+function self:NewTab(data)
+local self = setmetatable({},self)
+
+self.List2 = Instance.new("UIListLayout")
+self.TabBtn = Instance.new("TextButton")
+self.Corner = Instance.new("UICorner")
+self.Corner2 = Instance.new("UICorner")
+self.TabFrame = Instance.new("ScrollingFrame")
+
+self.Corner.Parent = self.TabBtn
+self.Corner2.Parent = self.TabFrame
+
+self.Corner.CornerRadius = UDim.new(0, 6)
+self.Corner2.CornerRadius = UDim.new(0, 6)
+
+self.TabBtn.Size = UDim2.new(1, 0, 0.1, 0)
+self.TabBtn.BackgroundTransparency = 0
+self.TabBtn.Text = data.Name
+self.TabBtn.Font = Enum.Font.DenkOne
+self.TabBtn.Parent = self.TabHandler
+self.TabBtn.TextColor3 = Color3.fromRGB(0,0,0)
+self.TabBtn.TextSize = 14
+self.TabBtn.Name = "b"
+
+
+self.TabFrame.Parent = self.Frame
+self.TabFrame.Size = UDim2.new(0.79,0,0.979,0)
+self.TabFrame.Position = UDim2.new(0.21,0,0.01,0)
+self.TabFrame.Visible = false
+self.TabFrame.Name = "Main"
+self.TabFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+self.TabFrame.ScrollBarThickness = 0.1
+self.TabFrame.BackgroundTransparency = 1
+self.TabFrame.CanvasSize = UDim2.new(0,0,0,0)
+
+self.List2.Parent = self.TabFrame
+self.List2.Padding = UDim.new(0.01,0)
+
+local t = self.TabBtn.BackgroundColor3
+Tabs[data.Name] = self.TabFrame
+local yPos = self.TabBtn.AbsolutePosition.Y
+self.TabBtn.MouseButton1Click:Connect(function()
   
-local Tab = setmetatable({},Tab)
-
-Tab.List2 = Instance.new("UIListLayout")
-Tab.TabBtn = Instance.new("TextButton")
-Tab.Corner = Instance.new("UICorner")
-Tab.Corner2 = Instance.new("UICorner")
-Tab.TabFrame = Instance.new("ScrollingFrame")
-
-Tab.Corner.Parent = Tab.TabBtn
-Tab.Corner2.Parent = Tab.TabFrame
-
-Tab.Corner.CornerRadius = UDim.new(0, 6)
-Tab.Corner2.CornerRadius = UDim.new(0, 6)
-
-Tab.TabBtn.Size = UDim2.new(1, 0, 0.1, 0)
-Tab.TabBtn.BackgroundTransparency = 0
-Tab.TabBtn.Text = data.Name
-Tab.TabBtn.Font = Enum.Font.DenkOne
-Tab.TabBtn.Parent = myWindow.TabHandler
-Tab.TabBtn.TextColor3 = Color3.fromRGB(0,0,0)
-Tab.TabBtn.TextSize = 14
-Tab.TabBtn.Name = "b"
-
-
-Tab.TabFrame.Parent = myWindow.Frame
-Tab.TabFrame.Size = UDim2.new(0.79,0,0.979,0)
-Tab.TabFrame.Position = UDim2.new(0.21,0,0.01,0)
-Tab.TabFrame.Visible = false
-Tab.TabFrame.Name = "Main"
-Tab.TabFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-Tab.TabFrame.ScrollBarThickness = 0.1
-Tab.TabFrame.BackgroundTransparency = 1
-Tab.TabFrame.CanvasSize = UDim2.new(0,0,0,0)
-
-Tab.List2.Parent = Tab.TabFrame
-Tab.List2.Padding = UDim.new(0.01,0)
-
-local t = Tab.TabBtn.BackgroundColor3
-Tabs[data.Name] = Tab.TabFrame
-local yPos = Tab.TabBtn.AbsolutePosition.Y
-Tab.TabBtn.MouseButton1Click:Connect(function()
-  
-  local Tween = TweenService:Create(myWindow.SelectedTab, TweenInfo.new(0.5,Enum.EasingStyle.Exponential), {
+  local Tween = TweenService:Create(self.SelectedTab, TweenInfo.new(0.5,Enum.EasingStyle.Exponential), {
     Position = UDim2.new(0.01,0,0,yPos + 3)
 })
 
@@ -284,273 +282,273 @@ for k,v in pairs(Tabs) do
       local newR = math.clamp(oldColorNight.R + 20, 0, 255)
       local newG = math.clamp(oldColorNight.G + 20, 0, 255)
       local newB = math.clamp(oldColorNight.B + 20, 0, 255)
-      TweenColor(Color3.new(newR / 255, newG / 255, newB / 255),Tab.TabBtn,TweenInfo.new(0.2,Enum.EasingStyle.Linear))
+      TweenColor(Color3.new(newR / 255, newG / 255, newB / 255),self.TabBtn,TweenInfo.new(0.2,Enum.EasingStyle.Linear))
       else
       local oldColorLight = LightModeColors.ButtonsColor
       local newRLight = math.clamp(oldColorLight.R +15, 0, 255)
       local newGLight= math.clamp(oldColorLight.G +15, 0, 255)
       local newBLight = math.clamp(oldColorLight.B + 15, 0, 255)
-      TweenColor(Color3.new(newRLight, newGLight, newBLight),Tab.TabBtn,TweenInfo.new(0.2,Enum.EasingStyle.Linear))
+      TweenColor(Color3.new(newRLight, newGLight, newBLight),self.TabBtn,TweenInfo.new(0.2,Enum.EasingStyle.Linear))
       
       end
   end
 end
 end)
-function Tab:NewButton(data)
-local button = setmetatable({},Buttons)
+function self:NewButton(data)
+local self = setmetatable({},Buttons)
 
-button.button = Instance.new("TextButton")
-button.Corner = Instance.new("UICorner")
+self.button = Instance.new("TextButton")
+self.Corner = Instance.new("UICorner")
 
-button.button.Parent = Tab.TabFrame
-button.button.Text = data.Name
-button.button.Font = Enum.Font.DenkOne
-button.button.Size = Sizes.Buttons
-button.button.Position = UDim2.new(0.5,0,0.5,0)
-button.button.TextColor3 = Color3.new(0,0,0)
-button.button.TextSize = 14
-button.button.Name = "a"
-button.button.ZIndex = 999
+self.button.Parent = self.TabFrame
+self.button.Text = data.Name
+self.button.Font = Enum.Font.DenkOne
+self.button.Size = Sizes.Buttons
+self.button.Position = UDim2.new(0.5,0,0.5,0)
+self.button.TextColor3 = Color3.new(0,0,0)
+self.button.TextSize = 14
+self.button.Name = "a"
+self.button.ZIndex = 999
 
-button.Corner.Parent = button.button
-button.Corner.CornerRadius = UDim.new(0,6)
+self.button.Corner.Parent = self.button
+self.button.Corner.CornerRadius = UDim.new(0,6)
 
-button.button.BackgroundColor3 = Color3.fromRGB(47,47,47)
+self.button.BackgroundColor3 = Color3.fromRGB(47,47,47)
 
-button.button.MouseButton1Click:Connect(function() 
+self.button.MouseButton1Click:Connect(function() 
 data.Callback()
    end)
    
    
-   return button
+   
 end
-function Tab:NewToggle(data)
-local toggle = setmetatable({},Toggle)
+function self:NewToggle(data)
+local self = setmetatable({},Toggle)
 
-toggle.button = Instance.new("TextButton")
-toggle.Corner = Instance.new("UICorner")
-toggle.Corner2 = Instance.new("UICorner")
-toggle.Corner3 = Instance.new("UICorner")
-toggle.Toggle = Instance.new("Frame")
+self.button = Instance.new("TextButton")
+self.Corner = Instance.new("UICorner")
+self.Corner2 = Instance.new("UICorner")
+self.Corner3 = Instance.new("UICorner")
+self.Toggle = Instance.new("Frame")
 
-toggle.button.Parent = Tab.TabFrame
-toggle.button.Text = data.Name
-toggle.button.Font = Enum.Font.DenkOne
-toggle.button.Size = Sizes.Toggles
-toggle.button.Position = UDim2.new(0.5,0,0.5,0)
-toggle.button.TextColor3 = Color3.fromRGB(0,0,0)
-toggle.button.TextSize = 14
-toggle.button.Name = "a"
+self.button.Parent = self.TabFrame
+self.button.Text = data.Name
+self.button.Font = Enum.Font.DenkOne
+self.button.Size = Sizes.Toggles
+self.button.Position = UDim2.new(0.5,0,0.5,0)
+self.button.TextColor3 = Color3.fromRGB(0,0,0)
+self.button.TextSize = 14
+self.button.Name = "a"
 
-toggle.Toggle.Parent = toggle.button
-toggle.Toggle.Size = UDim2.new(0.05,0,0.7,0)
-toggle.Toggle.Position = UDim2.new(0.93,0,0.179,0)
+self.Toggle.Parent = self.button
+self.Toggle.Size = UDim2.new(0.05,0,0.7,0)
+self.Toggle.Position = UDim2.new(0.93,0,0.179,0)
 
-toggle.Corner.Parent = toggle.button
-toggle.Corner.CornerRadius = UDim.new(0,6)
+self.Corner.Parent = self.button
+self.Corner.CornerRadius = UDim.new(0,6)
 
 
  
-toggle.Corner3.Parent = toggle.Toggle
-toggle.Corner3.CornerRadius = UDim.new(9,9)
+self.Corner3.Parent = self.Toggle
+self.Corner3.CornerRadius = UDim.new(9,9)
 
-toggle.button.MouseButton1Click:Connect(function()
+self.button.MouseButton1Click:Connect(function()
   data.Value = not data.Value
   if data.Value == false then
-    toggle.Toggle.BackgroundColor3 = Color3.fromRGB(64,64,64)
+    self.Toggle.BackgroundColor3 = Color3.fromRGB(64,64,64)
     else
-      toggle.Toggle.BackgroundColor3 = Color3.fromRGB(75, 151, 75)
+      self.Toggle.BackgroundColor3 = Color3.fromRGB(75, 151, 75)
   end
   
     data.Callback(data.Value)
     
 end)
-   return toggle
+   
   end
-function Tab:NewSlider(data)
-    local slider = setmetatable({},Sliders)
-    slider.Slider = Instance.new("Frame")
-    slider.Fill = Instance.new("Frame")
-    slider.Trigger = Instance.new("TextButton")
-    slider.Display = Instance.new("TextLabel")
-    slider.outputValue = 0.5
-    slider.Corner = Instance.new("UICorner")
-    slider.Corner2 = Instance.new("UICorner")
-    slider.sliderActive = false
+function self:NewSlider(data)
+    local self = setmetatable({},Sliders)
+    self.Slider = Instance.new("Frame")
+    self.Fill = Instance.new("Frame")
+    self.Trigger = Instance.new("TextButton")
+    self.Display = Instance.new("TextLabel")
+    self.outputValue = 0.5
+    self.Corner = Instance.new("UICorner")
+    self.Corner2 = Instance.new("UICorner")
+    self.sliderActive = false
     
-    slider.Slider.Parent = Tab.TabFrame
-    slider.Slider.Size = Sizes.Sliders
-    slider.Slider.Name = "a"
-    slider.Slider.BackgroundTransparency = 1
+    self.Slider.Parent = self.TabFrame
+    self.Slider.Size = Sizes.Sliders
+    self.Slider.Name = "a"
+    self.Slider.BackgroundTransparency = 1
     
-    slider.Corner.Parent = slider.Slider
-    slider.Corner.CornerRadius = UDim.new(0, 6)
+    self.Corner.Parent = self.Slider
+    self.Corner.CornerRadius = UDim.new(0, 6)
     
-    slider.Corner2.Parent = slider.Fill
-    slider.Corner2.CornerRadius = UDim.new(0, 6)
+    self.Corner2.Parent = self.Fill
+    self.Corner2.CornerRadius = UDim.new(0, 6)
     
-    slider.Fill.Parent = slider.Slider
-    slider.Fill.Size = UDim2.new(slider.outputValue/2, 0, 1, 0)
-    slider.Fill.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+    self.Fill.Parent = self.Slider
+    self.Fill.Size = UDim2.new(self.outputValue/2, 0, 1, 0)
+    self.Fill.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
     
-    slider.Trigger.Parent = slider.Slider
-    slider.Trigger.BackgroundTransparency = 1
-    slider.Trigger.Text = ""
-    slider.Trigger.Size = UDim2.new(1, 0, 1, 0)
-    slider.Trigger.MouseButton1Down:Connect(function()
-        slider:ActivateSlider() -- Use instance-specific method
+    self.Trigger.Parent = self.Slider
+    self.Trigger.BackgroundTransparency = 1
+    self.Trigger.Text = ""
+    self.Trigger.Size = UDim2.new(1, 0, 1, 0)
+    self.Trigger.MouseButton1Down:Connect(function()
+        self:ActivateSlider() -- Use instance-specific method
     end)
     
-    slider.Display.AnchorPoint = Vector2.new(0, 0.5)
-    slider.Display.BackgroundTransparency = 1
-    slider.Display.Position = UDim2.new(0, 0, 0.5, 0)
-    slider.Display.Size = UDim2.new(1, 0, 0.5, 0)
-    slider.Display.Parent = slider.Slider
-    slider.Display.Text = data.Name.." "..tostring(data.Start)
-    slider.Display.TextSize = 14
-    slider.Display.Font = Enum.Font.DenkOne
-    slider.Display.TextColor3 = Color3.fromRGB(0,0,0)
+    self.Display.AnchorPoint = Vector2.new(0, 0.5)
+    self.Display.BackgroundTransparency = 1
+    self.Display.Position = UDim2.new(0, 0, 0.5, 0)
+    self.Display.Size = UDim2.new(1, 0, 0.5, 0)
+    self.Display.Parent = self.Slider
+    self.Display.Text = data.Name.." "..tostring(data.Start)
+    self.Display.TextSize = 14
+    self.Display.Font = Enum.Font.DenkOne
+    self.Display.TextColor3 = Color3.fromRGB(0,0,0)
     
     game:GetService("UserInputService").InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            slider.sliderActive = false
+            self.sliderActive = false
         end
     end)
     
-    function slider:UpdateSlider()
-        slider.output = math.clamp((Mouse.X - slider.Slider.AbsolutePosition.X) / slider.Slider.AbsoluteSize.X, 0, 1)
-        data.Callback(math.round(slider.output * data.Max))
-        if slider.outputValue ~= slider.output then
+    function self:UpdateSlider()
+        self.output = math.clamp((Mouse.X - self.Slider.AbsolutePosition.X) / self.Slider.AbsoluteSize.X, 0, 1)
+        data.Callback(math.round(self.output * data.Max))
+        if self.outputValue ~= self.output then
           
-            TweenService:Create(slider.Fill, TweenInfo.new(0.2), { Size = UDim2.new(slider.output, 0, 1, 0) }):Play()
+            TweenService:Create(self.Fill, TweenInfo.new(0.2), { Size = UDim2.new(self.output, 0, 1, 0) }):Play()
         end
-        slider.outputValue = slider.output
-        slider.Display.Text = data.Name.." "..tostring(math.round(slider.output * data.Max))
+        self.outputValue = self.output
+        self.Display.Text = data.Name.." "..tostring(math.round(self.output * data.Max))
     end
 
-    function slider:ActivateSlider()
-        slider.sliderActive = true
-        while slider.sliderActive do
+    function self:ActivateSlider()
+        self.sliderActive = true
+        while self.sliderActive do
             wait()
-            slider:UpdateSlider()
+            self:UpdateSlider()
         end
     end
     
-    return slider
+    
 end
 
-function Tab:NewSection(data)
+function self:NewSection(data)
   
-local section = setmetatable({},Labels)
-section.label = Instance.new("TextLabel")
-section.Corner = Instance.new("UICorner")
+local self = setmetatable({},Labels)
+self.label = Instance.new("TextLabel")
+self.Corner = Instance.new("UICorner")
 
-section.label.Parent = Tab.TabFrame
-section.label.Text = data.Name
-section.label.Font = Enum.Font.DenkOne
-section.label.Size = UDim2.new(1, 0, 0.12, 0)
-section.label.Position = UDim2.new(0.5,0,0.5,0)
-section.label.TextSize = 14
-section.label.Name = "a"
-section.label.BackgroundTransparency = 1
-section.Corner.Parent = section.label
-section.Corner.CornerRadius = UDim.new(0,6)
+self.label.Parent = self.TabFrame
+self.label.Text = data.Name
+self.label.Font = Enum.Font.DenkOne
+self.label.Size = UDim2.new(1, 0, 0.12, 0)
+self.label.Position = UDim2.new(0.5,0,0.5,0)
+self.label.TextSize = 14
+self.label.Name = "a"
+self.label.BackgroundTransparency = 1
+self.Corner.Parent = self.label
+self.Corner.CornerRadius = UDim.new(0,6)
 
-   return section
+   
 end
-function Tab:NewDropDown(data)
-  local dropdown = setmetatable({},DropDown)
+function self:NewDropDown(data)
+  local self = setmetatable({},DropDown)
   
-  dropdown.DropDownBtn = Instance.new("TextButton")
-  dropdown.DropDownFrame = Instance.new("ScrollingFrame")
-  dropdown.DropDownText = Instance.new("TextLabel")
-  dropdown.List = Instance.new("UIListLayout")
-  dropdown.Corner = Instance.new("UICorner")
-  dropdown.Corner2 = Instance.new("UICorner")
+  self.DropDownBtn = Instance.new("TextButton")
+  self.DropDownFrame = Instance.new("ScrollingFrame")
+  self.DropDownText = Instance.new("TextLabel")
+  self.List = Instance.new("UIListLayout")
+  self.Corner = Instance.new("UICorner")
+  self.Corner2 = Instance.new("UICorner")
   
-  dropdown.DropDownBtn.Parent = Tab.TabFrame
-  dropdown.DropDownFrame.Parent = dropdown.DropDownBtn
-  dropdown.DropDownText.Parent = dropdown.DropDownBtn
+  self.DropDownBtn.Parent = self.TabFrame
+  self.DropDownFrame.Parent = self.DropDownBtn
+  self.DropDownText.Parent = self.DropDownBtn
   
-  dropdown.DropDownBtn.Size = Sizes.DropDowns
-  dropdown.DropDownBtn.Font = Enum.Font.DenkOne
-  dropdown.DropDownBtn.Font = Enum.Font.DenkOne
-  dropdown.DropDownBtn.TextSize = 14
-  dropdown.DropDownBtn.TextColor3 = Color3.fromRGB(0,0,0)
+  self.DropDownBtn.Size = Sizes.DropDowns
+  self.DropDownBtn.Font = Enum.Font.DenkOne
+  self.DropDownBtn.Font = Enum.Font.DenkOne
+  self.DropDownBtn.TextSize = 14
+  self.DropDownBtn.TextColor3 = Color3.fromRGB(0,0,0)
   
-  dropdown.DropDownFrame.Size = UDim2.new(0.3,0,0,0)
-  dropdown.DropDownFrame.Position = UDim2.new(0.7,0,1,0)
-  dropdown.DropDownFrame.ZIndex = 9999
-  dropdown.DropDownFrame.Visible = false
-  dropdown.DropDownFrame.Name = "Drop Down Frame"
+  self.DropDownFrame.Size = UDim2.new(0.3,0,0,0)
+  self.DropDownFrame.Position = UDim2.new(0.7,0,1,0)
+  self.DropDownFrame.ZIndex = 9999
+  self.DropDownFrame.Visible = false
+  self.DropDownFrame.Name = "Drop Down Frame"
   
-  dropdown.DropDownText.Size = UDim2.new(0.3,0,1,0)
-  dropdown.DropDownText.BackgroundTransparency = 1
-  dropdown.DropDownText.Text = data.Name
-  dropdown.DropDownText.Font = Enum.Font.DenkOne
-  dropdown.DropDownText.TextSize = 14
-  dropdown.DropDownText.TextColor3 = Color3.fromRGB(0,0,0)
+  self.DropDownText.Size = UDim2.new(0.3,0,1,0)
+  self.DropDownText.BackgroundTransparency = 1
+  self.DropDownText.Text = data.Name
+  self.DropDownText.Font = Enum.Font.DenkOne
+  self.DropDownText.TextSize = 14
+  self.DropDownText.TextColor3 = Color3.fromRGB(0,0,0)
   
-  dropdown.Corner.Parent = dropdown.DropDownBtn
-  dropdown.Corner.CornerRadius = UDim.new(0,6)
+  self.Corner.Parent = self.DropDownBtn
+  self.Corner.CornerRadius = UDim.new(0,6)
   
-  dropdown.Corner2.Parent = dropdown.DropDownFrame
-  dropdown.Corner2.CornerRadius = UDim.new(0,6)
+  self.Corner2.Parent = self.DropDownFrame
+  self.Corner2.CornerRadius = UDim.new(0,6)
   
-  dropdown.List.Parent = dropdown.DropDownFrame
+  self.List.Parent = self.DropDownFrame
   
-  local close = TweenService:Create(dropdown.DropDownFrame,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{Size = UDim2.new(0.3,0,0,0)})
-  local open = TweenService:Create(dropdown.DropDownFrame,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{Size = UDim2.new(0.3,0,0,200)})
+  local close = TweenService:Create(self.DropDownFrame,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{Size = UDim2.new(0.3,0,0,0)})
+  local open = TweenService:Create(self.DropDownFrame,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{Size = UDim2.new(0.3,0,0,200)})
   local Opened = false
-  dropdown.DropDownBtn.MouseButton1Click:Connect(function()
+  self.DropDownBtn.MouseButton1Click:Connect(function()
       if Opened then
           close:Play()
           Opened = false
           wait(0.3)
-          dropdown.DropDownFrame.Visible = false
+          self.DropDownFrame.Visible = false
       else
-        dropdown.DropDownFrame.Visible = true
+        self.DropDownFrame.Visible = true
           open:Play()
           Opened = true
           
       end
   end)
-  function dropdown:NewObject(data2)
-  local DropDownObject = setmetatable({},DropDownObject)
+  function self:NewObject(data2)
+  local self = setmetatable({},DropDownObject)
   
-  DropDownObject.button = Instance.new("TextButton")
-  DropDownObject.corner = Instance.new("UICorner")
+  self.button = Instance.new("TextButton")
+  self.corner = Instance.new("UICorner")
   
-  DropDownObject.button.Parent = dropdown.DropDownFrame
-  DropDownObject.button.Size = UDim2.new(1,0,0.1,0)
-  DropDownObject.button.BackgroundColor3 = Color3.fromRGB(0,0,0)
-  DropDownObject.button.ZIndex = 99999
-  DropDownObject.button.Text = data2.Name
-  DropDownObject.button.Font = Enum.Font.DenkOne
-  DropDownObject.button.TextSize = 14
-  DropDownObject.button.TextColor3 = Color3.fromRGB(0,0,0)
+  self.button.Parent = self.DropDownFrame
+  self.button.Size = UDim2.new(1,0,0.1,0)
+  self.button.BackgroundColor3 = Color3.fromRGB(0,0,0)
+  self.button.ZIndex = 99999
+  self.button.Text = data2.Name
+  self.button.Font = Enum.Font.DenkOne
+  self.button.TextSize = 14
+  self.button.TextColor3 = Color3.fromRGB(0,0,0)
   
-  DropDownObject.corner.Parent = DropDownObject.button
-  DropDownObject.corner.CornerRadius = UDim.new(0,6)
+  self.corner.Parent = self.button
+  self.corner.CornerRadius = UDim.new(0,6)
   
-  DropDownObject.button.MouseButton1Click:Connect(function()
+  self.button.MouseButton1Click:Connect(function()
       close:Play()
-      dropdown.DropDownText.Text = DropDownObject.button.Text
+      self.DropDownText.Text = self.button.Text
       Opened = false
-      data.Callback(dropdown.DropDownText.Text)
+      data.Callback(self.DropDownText.Text)
       wait(0.3)
-      dropdown.DropDownFrame.Visible = false
+      self.DropDownFrame.Visible = false
     end)
   
-  return DropDownObject
+  
 end
-  return dropdown
+  
 end
 
-return Tab
+
 
 end
-return Window
+return self
 -- end of the function
 end
 
