@@ -311,7 +311,7 @@ self.button.Name = "a"
 self.button.ZIndex = 999
 
 self.Corner.Parent = self.button
-self.button.Corner.CornerRadius = UDim.new(0,6)
+self.Corner.CornerRadius = UDim.new(0,6)
 
 self.button.BackgroundColor3 = Color3.fromRGB(47,47,47)
 
