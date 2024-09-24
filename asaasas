@@ -311,7 +311,7 @@ self.button.Name = "a"
 self.button.ZIndex = 999
 
 self.Corner.Parent = self.button
-self.Corner.CornerRadius = UDim.new(0,6)
+self.button.Corner.CornerRadius = UDim.new(0,6)
 
 self.button.BackgroundColor3 = Color3.fromRGB(47,47,47)
 
@@ -320,7 +320,7 @@ data.Callback()
    end)
    
    
-   
+   return self
 end
 function self:NewToggle(data)
 local self = setmetatable({},Toggle)
@@ -363,8 +363,8 @@ self.button.MouseButton1Click:Connect(function()
     data.Callback(data.Value)
     
 end)
-   
-  end
+   return self
+end
 function self:NewSlider(data)
     local self = setmetatable({},Sliders)
     self.Slider = Instance.new("Frame")
@@ -434,7 +434,7 @@ function self:NewSlider(data)
         end
     end
     
-    
+    return self
 end
 
 function self:NewSection(data)
@@ -453,7 +453,7 @@ self.label.Name = "a"
 self.label.BackgroundTransparency = 1
 self.Corner.Parent = self.label
 self.Corner.CornerRadius = UDim.new(0,6)
-
+return self
    
 end
 function self:NewDropDown(data)
@@ -540,9 +540,9 @@ function self:NewDropDown(data)
       self.DropDownFrame.Visible = false
     end)
   
-  
+  return self
 end
-  
+  return self
 end
 
 return self
