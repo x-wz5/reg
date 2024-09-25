@@ -365,9 +365,13 @@ toggle.button.MouseButton1Click:Connect(function()
     else
       toggle.Toggle.BackgroundColor3 = Color3.fromRGB(75, 151, 75)
   end
-  
+  while data.Value do
+    wait()
     data.Callback(data.Value)
-    
+  end
+  if data.Value == false then
+    data.Callback(data.Value)
+  end
 end)
    return toggle
   end
