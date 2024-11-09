@@ -492,12 +492,12 @@ function self:NewDropDown(data)
   dropdown.DropDownBtn.Font = Enum.Font.DenkOne
   dropdown.DropDownBtn.TextSize = 14
   dropdown.DropDownBtn.TextColor3 = Color3.fromRGB(0,0,0)
+  dropdown.DropDownBtn.Name = "a"
   
   dropdown.DropDownFrame.Size = UDim2.new(0.3,0,0,0)
   dropdown.DropDownFrame.Position = UDim2.new(0.7,0,1,0)
   dropdown.DropDownFrame.ZIndex = 9999
   dropdown.DropDownFrame.Visible = false
-  dropdown.DropDownFrame.Name = "a"
   
   dropdown.DropDownText.Size = UDim2.new(0.3,0,1,0)
   dropdown.DropDownText.BackgroundTransparency = 1
