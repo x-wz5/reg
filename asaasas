@@ -454,19 +454,27 @@ section.label = Instance.new("TextLabel")
 section.Corner = Instance.new("UICorner")
 
 section.label.Parent = self.TabFrame
-section.label.Text = data.Name
+section.label.Text = data.Txt
 section.label.Font = Enum.Font.DenkOne
 section.label.Size = UDim2.new(1, 0, 0.12, 0)
 section.label.Position = UDim2.new(0.5,0,0.5,0)
 section.label.TextSize = 14
 section.label.Name = "a"
 section.label.BackgroundTransparency = 1
+section.label.TextXAlignment = Enum.TextXAlignment.Left
+section.label.TextColor3 = Color3.fromRGB(50,50,50)
 section.Corner.Parent = section.label
 section.Corner.CornerRadius = UDim.new(0,6)
 
    return section
 end
 function self:NewDropDown(data)
+  --[[
+  data: Name: String,Callback: function
+  data2 Name: String
+  ]]
+  
+  
   local dropdown = setmetatable({},DropDown)
   
   dropdown.DropDownBtn = Instance.new("TextButton")
@@ -475,7 +483,6 @@ function self:NewDropDown(data)
   dropdown.List = Instance.new("UIListLayout")
   dropdown.Corner = Instance.new("UICorner")
   dropdown.Corner2 = Instance.new("UICorner")
-  
   dropdown.DropDownBtn.Parent = self.TabFrame
   dropdown.DropDownFrame.Parent = dropdown.DropDownBtn
   dropdown.DropDownText.Parent = dropdown.DropDownBtn
@@ -490,7 +497,7 @@ function self:NewDropDown(data)
   dropdown.DropDownFrame.Position = UDim2.new(0.7,0,1,0)
   dropdown.DropDownFrame.ZIndex = 9999
   dropdown.DropDownFrame.Visible = false
-  dropdown.DropDownFrame.Name = "Drop Down Frame"
+  dropdown.DropDownFrame.Name = "a"
   
   dropdown.DropDownText.Size = UDim2.new(0.3,0,1,0)
   dropdown.DropDownText.BackgroundTransparency = 1
@@ -514,7 +521,7 @@ function self:NewDropDown(data)
       if Opened then
           close:Play()
           Opened = false
-          wait(0.3)
+          task.wait(0.3)
           dropdown.DropDownFrame.Visible = false
       else
         dropdown.DropDownFrame.Visible = true
@@ -537,6 +544,7 @@ function self:NewDropDown(data)
   DropDownObject.button.Font = Enum.Font.DenkOne
   DropDownObject.button.TextSize = 14
   DropDownObject.button.TextColor3 = Color3.fromRGB(0,0,0)
+  DropDownObject.button.Name = "a"
   
   DropDownObject.corner.Parent = DropDownObject.button
   DropDownObject.corner.CornerRadius = UDim.new(0,6)
@@ -546,7 +554,7 @@ function self:NewDropDown(data)
       dropdown.DropDownText.Text = DropDownObject.button.Text
       Opened = false
       data.Callback(dropdown.DropDownText.Text)
-      wait(0.3)
+      task.wait(0.3)
       dropdown.DropDownFrame.Visible = false
     end)
   
