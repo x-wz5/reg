@@ -9,14 +9,12 @@ local TweenService = game:GetService("TweenService")
 -- Player variables: Player mouse, Character, speed
 local Mouse = plr:GetMouse()
 local Character = plr.Character
-local Allowed = {
-	["Quake_Hub"] = true
-}
+
 
 local TweenStyle = TweenInfo.new(0.30,Enum.EasingStyle.Exponential)
 
 
-if not Allowed[plr.Name] then
+
 if game:GetService("CoreGui"):FindFirstChild("Key System") then
   game:GetService("CoreGui"):FindFirstChild("Key System"):FindFirstChild("Key TextBox",true).Text = "Already Send Key"
   return
@@ -204,7 +202,6 @@ if not Valid then
   repeat
     task.wait()
   until Valid
-end
 end
 --
 local CoreUi = game:GetService("CoreGui")
@@ -665,7 +662,7 @@ function self:NewDropDown(data)
   data: Name: String,Callback: function
   data2 Name: String
   ]]
-  assert(type(data.Name) == "string","Error: data.Name Expected string type, got: "..type(data.name))
+  assert(type(data.Name) == "string","Error: data.Name Expected string type, got: "..type(data.Name))
   assert(type(data.Callback) == "function","Error: data.Callback Expected function, got: "..type(data.Callback))
   
   local dropdown = setmetatable({},DropDown)
