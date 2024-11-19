@@ -198,7 +198,11 @@ TextButton.MouseButton1Click:Connect(function()
 end)
 
 repeat task.wait() until DidSubmit
-if not Valid then return end
+if not Valid then
+  repeat
+    task.wait()
+  until Valid
+end
 --
 local CoreUi = game:GetService("CoreGui")
 
@@ -320,7 +324,7 @@ self.Apear.Parent = Frame
 self.Close.Parent = self.Sg
 SelectedTab.Parent = Frame
 
-self.Sg.Name = "Quake Hub"
+self.Sg.Name = "Tiger Hub"
 
 Frame.Size = UDim2.new(0.55, 0, 0.60, 0)
 Frame.Position = UDim2.new(0, 0.5, 0, 0.5)
@@ -658,7 +662,8 @@ function self:NewDropDown(data)
   data: Name: String,Callback: function
   data2 Name: String
   ]]
-  
+  assert(type(data.Name) == "string","Error: data.Name Expected string type, got: "..type(data.name))
+  assert(type(data.Callback) == "function","Error: data.Callback Expected function, got: "..type(data.Callback))
   
   local dropdown = setmetatable({},DropDown)
   
@@ -670,7 +675,7 @@ function self:NewDropDown(data)
   dropdown.Corner2 = Instance.new("UICorner")
   dropdown.DropDownBtn.Parent = self.TabFrame
   dropdown.DropDownFrame.Parent = dropdown.DropDownBtn
-  dropdown.DropDownText.Parent = dropdown.DropDownBtn
+  dropdown.DropDownText.Parent = dropdown.DropDownBtn 
   
   dropdown.DropDownBtn.Size = Sizes.DropDowns
   dropdown.DropDownBtn.Text "Drop down"
@@ -717,6 +722,9 @@ function self:NewDropDown(data)
       end
   end)
   function dropdown:NewObject(data2)
+    
+    assert(type(data2.Name) == "string","Error: data.Name Expected string type, got: "..type(data2.name))
+    
   local DropDownObject = setmetatable({},DropDownObject)
   
   DropDownObject.button = Instance.new("TextButton")
