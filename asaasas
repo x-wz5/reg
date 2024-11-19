@@ -25,11 +25,6 @@ local plr = Players.LocalPlayer
 local char = plr.Character
 local TweenService = game:GetService("TweenService")
 
--- Player variables: Player mouse, Character, speed
-local Mouse = plr:GetMouse()
-local Character = plr.Character
-
-local TweenStyle = TweenInfo.new(0.30, Enum.EasingStyle.Exponential)
 
 -- Function to send key to Discord Webhook
 local function sendKey(generatedKey)
@@ -37,53 +32,54 @@ local function sendKey(generatedKey)
     local Players = game:GetService("Players")
     local HttpService = game:GetService("HttpService")
 
-    -- Get the player's headshot thumbnail
-    local thumbUrl, isReady = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+    -- Ensure the player's thumbnail is ready
+    local thumbUrl, isReady
+    repeat
+        thumbUrl, isReady = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+        task.wait(0.1) -- Wait for thumbnail readiness
+    until isReady
 
     -- Construct the payload
     local payload = {
-        content = nil, -- Optional plain text (nil if unused)
-        embeds = {
-            {
-                title = "Key System", -- Title of the embed
-                description = "Key System For Tiger Hub", -- Main content
-                color = 0x7289da, -- Embed color in hexadecimal
-
-                fields = {
-                    {
-                        name = "Player Name",
-                        value = plr.Name,
-                        inline = true
-                    },
-                    {
-                        name = "Generated Key",
-                        value = generatedKey,
-                        inline = false
-                    }
-                },
-
-                image = {
-                    url = thumbUrl -- Player's headshot thumbnail
-                }
-            }
-        }
-    }
+		["embeds"] = {
+		  {
+			['username'] = "Info",
+			["title"] =
+			string.format([[
+[👤]
+`this is the key for the %s`
+[🔑]
+`Key: %s`
+]]
+			,plr.Name,generatedKey),
+			["type"] = "rich",
+			["color"] = tonumber(0x4287f5)
+		  }
+		}
+	}
 
     -- Encode the payload to JSON
     local jsonPayload = HttpService:JSONEncode(payload)
 
     -- Send the webhook request
-    local requestData = {
-        Url = WebHook,
-        Method = "POST",
-        Headers = {
-            ["Content-Type"] = "application/json"
-        },
-        Body = jsonPayload
-    }
+    local success, res = pcall(function()
+        request({
+            Url = WebHook,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = jsonPayload
+        })
+    end)
 
-    request(requestData)
+    if not success then
+        warn("Failed to send webhook:", res)
+    else
+        print("Webhook sent successfully")
+    end
 end
+
 
 -- Key generation function
 function newKey()
@@ -180,20 +176,14 @@ UICorner_2.Parent = TextButton
 
 -- Generate key and send to Discord
 local generatedKey = newKey()
-local success, err = pcall(function()
-    sendKey(generatedKey)
-end)
 
-if not success then
-    TextBox.Text = "Failed to send key to Discord."
-    print("Error:", err)
-    return
-end
+sendKey(generatedKey)
+
+
 
 -- Validation
 TextButton.MouseButton1Click:Connect(function()
     DidSubmit = true
-    
     if TextBox.Text == generatedKey then
         print("Worked")
         TextBox.Text = "Key Valid!"
@@ -202,7 +192,6 @@ TextButton.MouseButton1Click:Connect(function()
         task.wait(0.3)
         ScreenGui:Destroy()
     else
-        print("Idk")
         TextBox.Text = "Invalid Key!"
         TextBox.TextColor3 = Color3.new(1, 0, 0)
     end
