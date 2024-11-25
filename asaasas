@@ -1,3 +1,45 @@
+--[[
+  Document:
+    Window:
+    Paramter 1 = Data: table
+    Data:
+      Name: String
+    
+    Window:NewTab:
+    Paramter 1 = Data: table
+    Data:
+      Name: String
+  
+    Tab:NewButton:
+    Paramter 1 = Data: table
+    Data:
+      Name: String
+      Callback: function
+    
+    Tab:NewToggle:
+    Paramter 1 = Data: table
+    Data:
+      Name: String
+      Callback: function
+      Value = boolen
+    
+    Tab:Sliders:
+    Paramter 1 = Data: table
+    Data:
+      Name: String
+      Start: Number
+      Max: Number
+      Callback: function
+      Callback paramter 1: Max number
+    
+  
+  
+  
+]]
+
+
+
+
 -- variables
 
 -- game Variables: game:GetService: local Player/s
@@ -187,13 +229,14 @@ if not Allowed[plr.Name] then
   TextButton.MouseButton1Click:Connect(function()
       DidSubmit = true
       if TextBox.Text == generatedKey then
-          print("Worked")
+          print("Validation success!")
           TextBox.Text = "Key Valid!"
           TextBox.TextColor3 = Color3.new(0, 1, 0)
           Valid = true
           task.wait(0.3)
           ScreenGui:Destroy()
       else
+      	  print("Validation failed :(")
           TextBox.Text = "Invalid Key!"
           TextBox.TextColor3 = Color3.new(1, 0, 0)
       end
@@ -207,30 +250,43 @@ if not Allowed[plr.Name] then
   end
   --
 end
+
 local CoreUi = game:GetService("CoreGui")
 
-if CoreUi:FindFirstChild("Quake Hub") then
-  CoreUi["Quake Hub"]:Destroy()
+if CoreUi:FindFirstChild("Tiger Hub") then
+  CoreUi["Tiger Hub"]:Destroy()
 end
 
-local nightModeColors = {
- BackGroundColor = Color3.fromRGB(15 ,15,15),
- MainFrameColor = Color3.fromRGB(27,27,27),
- ButtonsColor = Color3.fromRGB(47,47,47),
- ToggleColor = Color3.fromRGB(57,57,57)
+local NightModeColors = {
+    BackGroundColor = Color3.fromRGB(20, 20, 20),       -- Deeper black for better dark theme
+    MainFrameColor = Color3.fromRGB(30, 30, 30),        -- Slight contrast with the background
+    ButtonsColor = Color3.fromRGB(50, 50, 50),          -- Darker, consistent button shade
+    OffToggleStat = Color3.fromRGB(40, 40, 40),         -- Slightly darker toggle off state
+    ToggleContainer = Color3.fromRGB(30,30,30),
+    TextColor = Color3.fromRGB(230, 230, 230),          -- Light gray for optimal readability
+    SlidersFillColor = {
+        Color3.fromRGB(0, 255, 255), -- Vibrant cyan for slider fill
+        Color3.fromRGB(120, 120, 120) -- Softer gray for slider text
+    }
 }
+
 local LightModeColors = {
- BackGroundColor = Color3.fromRGB(225 ,225,325),
- MainFrameColor = Color3.fromRGB(220,220,220),
- ButtonsColor = Color3.fromRGB(230,230,230),
- ToggleColor = Color3.fromRGB(247,247,247)
+    BackGroundColor = Color3.fromRGB(245, 245, 245),    -- Light, clean background
+    MainFrameColor = Color3.fromRGB(235, 235, 235),     -- Slight contrast for main frame
+    ButtonsColor = Color3.fromRGB(210, 210, 210),       -- Distinct buttons with neutral tone
+    OffToggleStat = Color3.fromRGB(200, 200, 200),      -- Slightly darker toggle off state
+    TextColor = Color3.fromRGB(60, 60, 60),             -- Darker gray for readability
+    SlidersFillColor = {
+        Color3.fromRGB(0, 255, 255), -- Cyan for slider fill
+        Color3.fromRGB(30, 30, 30)   -- Dark gray for slider text
+    }
 }
 
 local Sizes = {
-  Buttons = UDim2.new(1,0,0.12,0),
-  Sliders = UDim2.new(1,0,0.13,0),
-  Toggles = UDim2.new(1,0,0.125,0),
-  DropDowns = UDim2.new(1,0,0.15,0)
+	Buttons = UDim2.new(1, 0, 0.10, 0),
+	Sliders = UDim2.new(1, 0, 0.10, 0),
+	Toggles = UDim2.new(1, 0, 0.10, 0),
+	DropDowns = UDim2.new(1, 0, 0.13, 0)
 }
 
 
@@ -250,6 +306,8 @@ local NightMode = true
 local TabHandler = Instance.new("Frame")
 local SelectedTab = Instance.new("Frame")
 local Frame = Instance.new("Frame")
+
+
 Window.__index = Window
 Buttons.__index = Buttons
 Tab.__index = Tab
@@ -261,7 +319,7 @@ DropDown.__index = DropDown
 DropDownObject.__index = DropDownObject
 
 function ChangeMode()
-    local modeColors = NightMode and nightModeColors or LightModeColors
+    local modeColors = NightMode and NightModeColors or LightModeColors
 
     for _, v in pairs(Tabs) do
         if v.Name == "Main" then
@@ -269,15 +327,21 @@ function ChangeMode()
             v.BackgroundColor3 = modeColors.MainFrameColor
             v.Parent.TabHandler.BackgroundColor3 = modeColors.MainFrameColor
 
-            for _, child in pairs(v.Parent.TabHandler:GetChildren()) do
-                if child.Name == "b" then
-                    child.BackgroundColor3 = modeColors.ButtonsColor
-                
+            for _, tab in pairs(v.Parent.TabHandler:GetChildren()) do
+                if tab.Name == "b" then
+                    tab.BackgroundColor3 = modeColors.ButtonsColor
+                    tab.TextColor3 = modeColors.TextColor
                 end
             end
 
             for _, element in pairs(v:GetDescendants()) do
                 if element:IsA("TextButton") or element:IsA("TextLabel") then
+                	element.TextColor3 = modeColors.TextColor
+                	if element.Name == "Slider Fill" then
+                		element.BackgroundColor3 = modeColors.SlidersFillColor[1]
+                	elseif element.Name == "Slider Display" then
+                		element.BackgroundColor3 = modeColors.SlidersFillColor[2]
+                	end
                     element.BackgroundColor3 = modeColors.ButtonsColor
                     local dropDownFrame = element:FindFirstChild("Drop Down Frame")
                     if dropDownFrame then
@@ -294,6 +358,13 @@ end
 function TweenColor(Color,Object,Style)
   local Tween = TweenService:Create(Object, Style or TweenStyle, {
     BackgroundColor3 = Color
+})
+Tween:Play()
+end
+
+function TweenPosition(To,Object,Style)
+  local Tween = TweenService:Create(Object, Style or TweenStyle, {
+    Position = To
 })
 Tween:Play()
 end
@@ -334,20 +405,23 @@ Frame.Position = UDim2.new(0, 0.5, 0, 0.5)
 Frame.Active = true
 Frame.Draggable = true
 Frame.Name = "Main Frame"
+Frame.BackgroundColor3 = NightModeColors.BackGroundColor
+
 
 self.title.BackgroundTransparency = 1
 self.title.Text = data.Name
 self.title.Font = Enum.Font.DenkOne
-self.title.TextSize = 14
-self.title.TextColor3 = Color3.new(35,35,35)
+self.title.TextSize = 16
+self.title.TextColor3 = NightModeColors.TextColor
 self.title.Position = UDim2.new(0.1,0,0.94,0)
 self.title.ZIndex = 99
 
 self.Corner.CornerRadius = UDim.new(0, 6)
-self.Corner2.CornerRadius = UDim.new(0, 6)
+self.Corner2.CornerRadius = UDim.new(0, 20)
 self.Corner2.CornerRadius = UDim.new(0,6)
 
 TabHandler.Size = UDim2.new(0.20, 0, 1, 0)
+TabHandler.BackgroundColor3 = NightModeColors.MainFrameColor
 TabHandler.Name = "TabHandler"
 
 self.List.Parent = TabHandler
@@ -357,23 +431,17 @@ self.List2.Parent = self.TabFrame
 self.List2.Padding = UDim.new(0.01,0)
 
 self.Border.Parent = Frame
-self.Border.Thickness = 2.5
+self.Border.Thickness = 1
 
 self.Border2.Parent = TabHandler
-self.Border2.Thickness = 2.5
+self.Border2.Thickness = 1
 
-self.Shadow.Size = UDim2.new(2,0,2,0)
+self.Shadow.Size = UDim2.new(3,0,3,0)
 self.Shadow.ZIndex = -1
 self.Shadow.Image = "rbxassetid://18810622958"
 self.Shadow.ImageTransparency = 0
 self.Shadow.BackgroundTransparency = 1
-self.Shadow.Position = UDim2.new(-0.5,0,-0.5,0)
-
-self.Apear.Size = UDim2.new(0.06,0,0.1,0)
-self.Apear.Position = UDim2.new(0,0,0.8,0)
-self.Apear.Image = "rbxassetid://18812208598"
-self.Apear.BackgroundTransparency = 1
-self.Apear.ZIndex = 999
+self.Shadow.Position = UDim2.new(-1,0,-1,0)
 
 self.Close.Size = UDim2.new(0.07,0,0.07,0)
 self.Close.Position = UDim2.new(0.478,0,0.05,0)
@@ -382,16 +450,6 @@ self.Close.TextSize = 14
 self.Close.Font = Enum.Font.DenkOne
 self.Close.ZIndex = math.huge
 self.Close.Text = "X"
-
-self.Apear.MouseButton1Click:Connect(function()
-  NightMode = not NightMode
-  ChangeMode()
-  if NightMode == false then
-    self.Apear.Image = "rbxassetid://18829428142"
-    else
-      self.Apear.Image = "rbxassetid://18812208598"
-    end
-end)
 
 self.Close.MouseButton1Click:Connect(function() 
   self.Close.Parent["Main Frame"].Visible = not self.Close.Parent["Main Frame"].Visible
@@ -407,13 +465,24 @@ SelectedTab.Position = UDim2.new(0.01,0,0.01,0)
 
 self.Corner4.Parent = SelectedTab
 self.Corner4.CornerRadius = UDim.new(0,6)
+-- Settings setup
+local settings = Window:NewTab({Name = "Settings"})
+
+local Mode = settings:NewButton({
+	Name = "Background color",
+	Callback = function()
+		NightMode = not NightMode
+		ChangeMode()
+	end
+})
+
+
 return self
 end
 
 
 
 function Window:NewTab(data)
-  
 local self = setmetatable({},Tab)
 
 self.List2 = Instance.new("UIListLayout")
@@ -433,10 +502,10 @@ self.TabBtn.BackgroundTransparency = 0
 self.TabBtn.Text = data.Name
 self.TabBtn.Font = Enum.Font.DenkOne
 self.TabBtn.Parent = TabHandler
-self.TabBtn.TextColor3 = Color3.fromRGB(0,0,0)
+self.TabBtn.TextColor3 = NightModeColors.TextColor
 self.TabBtn.TextSize = 14
 self.TabBtn.Name = "b"
-
+self.TabBtn.BackgroundColor3 = NightModeColors.ButtonsColor
 
 self.TabFrame.Parent = Frame
 self.TabFrame.Size = UDim2.new(0.79,0,0.979,0)
@@ -467,7 +536,7 @@ for k,v in pairs(Tabs) do
     for _,Child in next,v.Parent.TabHandler:GetChildren() do
       if Child:IsA("TextButton") and Child.Name == "b" then
       if NightMode then
-      Child.BackgroundColor3 = nightModeColors.ButtonsColor
+      Child.BackgroundColor3 = NightModeColors.ButtonsColor
       else
         Child.BackgroundColor3 = LightModeColors.ButtonsColor
       end
@@ -476,7 +545,7 @@ for k,v in pairs(Tabs) do
     elseif k == data.Name then
       v.Visible = true
       if NightMode then
-      local oldColorNight = nightModeColors.ButtonsColor
+      local oldColorNight = NightModeColors.ButtonsColor
       local newR = math.clamp(oldColorNight.R + 20, 0, 255)
       local newG = math.clamp(oldColorNight.G + 20, 0, 255)
       local newB = math.clamp(oldColorNight.B + 20, 0, 255)
@@ -499,14 +568,16 @@ button.button = Instance.new("TextButton")
 button.Corner = Instance.new("UICorner")
 
 button.button.Parent = self.TabFrame
-button.button.Text = data.Name
+button.button.Text = "	"..data.Name
 button.button.Font = Enum.Font.DenkOne
 button.button.Size = Sizes.Buttons
 button.button.Position = UDim2.new(0.5,0,0.5,0)
-button.button.TextColor3 = Color3.new(0,0,0)
+button.button.TextColor3 = NightModeColors.TextColor
 button.button.TextSize = 14
 button.button.Name = "a"
 button.button.ZIndex = 999
+button.button.TextXAlignment = Enum.TextXAlignment.Left
+button.button.BackgroundTransparency = 0
 
 button.Corner.Parent = button.button
 button.Corner.CornerRadius = UDim.new(0,6)
@@ -527,53 +598,79 @@ toggle.button = Instance.new("TextButton")
 toggle.Corner = Instance.new("UICorner")
 toggle.Corner2 = Instance.new("UICorner")
 toggle.Corner3 = Instance.new("UICorner")
-toggle.Toggle = Instance.new("Frame")
+toggle.Container = Instance.new("Frame")
+toggle.Stat = Instance.new("Frame")
 
 toggle.button.Parent = self.TabFrame
-toggle.button.Text = data.Name
+toggle.button.Text = "	"..data.Name
 toggle.button.Font = Enum.Font.DenkOne
 toggle.button.Size = Sizes.Toggles
 toggle.button.Position = UDim2.new(0.5,0,0.5,0)
-toggle.button.TextColor3 = Color3.fromRGB(0,0,0)
+toggle.button.TextColor3 = NightModeColors.TextColor
 toggle.button.TextSize = 14
 toggle.button.Name = "a"
+toggle.button.TextXAlignment = Enum.TextXAlignment.Left
+toggle.button.BackgroundColor3 = NightModeColors.ButtonsColor
 
-toggle.Toggle.Parent = toggle.button
-toggle.Toggle.Size = UDim2.new(0.05,0,0.7,0)
-toggle.Toggle.Position = UDim2.new(0.93,0,0.179,0)
+toggle.Container.Parent = toggle.button
+toggle.Container.Size = UDim2.new(0.09,0,0.7,0)
+toggle.Container.Position = UDim2.new(0.84,0,0.179,0)
+toggle.Container.BackgroundColor3 = NightModeColors.ToggleContainer
 
+toggle.Stat.Parent = toggle.button
+toggle.Stat.Size = UDim2.new(0.05,0,0.7,0)
+toggle.Stat.Position = UDim2.new(0.84,0,0.179,0)
+toggle.Stat.BackgroundColor3 = NightModeColors.OffToggleStat
+-- start = 84, end = 88
 toggle.Corner.Parent = toggle.button
 toggle.Corner.CornerRadius = UDim.new(0,6)
 
+toggle.Corner2.Parent = toggle.Stat
+toggle.Corner2.CornerRadius = UDim.new(99,99)
 
- 
-toggle.Corner3.Parent = toggle.Toggle
-toggle.Corner3.CornerRadius = UDim.new(9,9)
+toggle.Corner3.Parent = toggle.Container
+toggle.Corner3.CornerRadius = UDim.new(0,9)
 
 toggle.button.MouseButton1Click:Connect(function()
-  data.Value = not data.Value
-  if data.Value == false then
-    toggle.Toggle.BackgroundColor3 = Color3.fromRGB(64,64,64)
-    else
-      toggle.Toggle.BackgroundColor3 = Color3.fromRGB(75, 151, 75)
-  end
-  while data.Value do
-    wait()
-    data.Callback(data.Value)
-  end
-  if data.Value == false then
-    data.Callback(data.Value)
-  end
-end)
+		data.Value = not data.Value
+		local style = TweenInfo.new(0.30,Enum.EasingStyle.Linear)
+		local posStyle = TweenInfo.new(
+        	0.2, -- Duration
+        	Enum.EasingStyle.Quad, -- Smooth easing
+        	Enum.EasingDirection.Out -- Natural deceleration
+    	)
+    
+		if data.Value == false then
+			TweenColor(NightModeColors.OffToggleStat,toggle.Stat,style)
+			TweenPosition(UDim2.new(0.84,0,0.179,0),toggle.Stat,style)
+		else
+			TweenColor(Color3.fromRGB(75, 151, 75),toggle.Stat,style)
+			TweenPosition(UDim2.new(0.88,0,0.179,0),toggle.Stat,posStyle)
+		end
+		while data.Value do
+			wait()
+			data.Callback(data.Value)
+		end
+		if data.Value == false then
+			data.Callback(data.Value)
+		end
+	end)
    return toggle
-  end
+end
+
+
 function self:NewSlider(data)
+  
+    
+  
     local slider = setmetatable({},Sliders)
     slider.Slider = Instance.new("Frame")
     slider.Fill = Instance.new("Frame")
     slider.Trigger = Instance.new("TextButton")
     slider.Display = Instance.new("TextLabel")
-    slider.outputValue = 0.5
+    
+    slider.outputValue = (data.Start / data.Max)
+    
     slider.Corner = Instance.new("UICorner")
     slider.Corner2 = Instance.new("UICorner")
     slider.sliderActive = false
@@ -590,8 +687,9 @@ function self:NewSlider(data)
     slider.Corner2.CornerRadius = UDim.new(0, 6)
     
     slider.Fill.Parent = slider.Slider
-    slider.Fill.Size = UDim2.new(slider.outputValue/2, 0, 1, 0)
-    slider.Fill.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+    slider.Fill.Size = UDim2.new(slider.outputValue, 0, 1, 0)
+    slider.Fill.BackgroundColor3 = NightModeColors.SlidersFillColor[1]
+    slider.Fill.Name = "Slider Fill"
     
     slider.Trigger.Parent = slider.Slider
     slider.Trigger.BackgroundTransparency = 1
@@ -606,10 +704,12 @@ function self:NewSlider(data)
     slider.Display.Position = UDim2.new(0, 0, 0.5, 0)
     slider.Display.Size = UDim2.new(1, 0, 0.5, 0)
     slider.Display.Parent = slider.Slider
-    slider.Display.Text = data.Name.." "..tostring(data.Start)
+    slider.Display.Text = "	"..data.Name.." "..tostring(data.Start)
     slider.Display.TextSize = 14
     slider.Display.Font = Enum.Font.DenkOne
-    slider.Display.TextColor3 = Color3.fromRGB(0,0,0)
+    slider.Display.TextColor3 = NightModeColors.SlidersFillColor[2]
+    slider.Display.TextXAlignment = Enum.TextXAlignment.Left
+    slider.Display.Name = "Slider Display"
     
     game:GetService("UserInputService").InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -639,27 +739,28 @@ function self:NewSlider(data)
     return slider
 end
 
-function self:NewSection(data)
+function self:NewSection(data,Size)
   
 local section = setmetatable({},Labels)
 section.label = Instance.new("TextLabel")
 section.Corner = Instance.new("UICorner")
 
 section.label.Parent = self.TabFrame
-section.label.Text = data.Name
+section.label.Text = " "..data.Name
 section.label.Font = Enum.Font.DenkOne
 section.label.Size = UDim2.new(1, 0, 0.12, 0)
 section.label.Position = UDim2.new(0.5,0,0.5,0)
-section.label.TextSize = 14
+section.label.TextSize = Size or 16
 section.label.Name = "a"
 section.label.BackgroundTransparency = 1
 section.label.TextXAlignment = Enum.TextXAlignment.Left
-section.label.TextColor3 = Color3.fromRGB(50,50,50)
+section.label.TextColor3 = NightModeColors.TextColor
 section.Corner.Parent = section.label
 section.Corner.CornerRadius = UDim.new(0,6)
 
    return section
 end
+
 function self:NewDropDown(data)
   --[[
   data: Name: String,Callback: function
@@ -685,8 +786,9 @@ function self:NewDropDown(data)
   dropdown.DropDownBtn.Font = Enum.Font.DenkOne
   dropdown.DropDownBtn.Font = Enum.Font.DenkOne
   dropdown.DropDownBtn.TextSize = 14
-  dropdown.DropDownBtn.TextColor3 = Color3.fromRGB(0,0,0)
+  dropdown.DropDownBtn.TextColor3 = NightModeColors.TextColor
   dropdown.DropDownBtn.Name = "a"
+  dropdown.DropDownBtn.TextXAlignment = Enum.TextXAlignment.Left
   
   dropdown.DropDownFrame.Size = UDim2.new(0.3,0,0,0)
   dropdown.DropDownFrame.Position = UDim2.new(0.7,0,1,0)
@@ -698,8 +800,8 @@ function self:NewDropDown(data)
   dropdown.DropDownText.Text = data.Name
   dropdown.DropDownText.Font = Enum.Font.DenkOne
   dropdown.DropDownText.TextSize = 14
-  dropdown.DropDownText.TextColor3 = Color3.fromRGB(0,0,0)
-  
+  dropdown.DropDownText.TextColor3 = NightModeColors.TextColor
+  dropdown.DropDownText.TextXAlignment = Enum.TextXAlignment.Left
   dropdown.Corner.Parent = dropdown.DropDownBtn
   dropdown.Corner.CornerRadius = UDim.new(0,6)
   
@@ -740,7 +842,8 @@ function self:NewDropDown(data)
   DropDownObject.button.Text = data2.Name
   DropDownObject.button.Font = Enum.Font.DenkOne
   DropDownObject.button.TextSize = 14
-  DropDownObject.button.TextColor3 = Color3.fromRGB(0,0,0)
+  DropDownObject.button.TextColor3 = NightModeColors.TextColor
+  DropDownObject.button.TextXAlignment = Enum.TextXAlignment.Left
   DropDownObject.button.Name = "a"
   
   DropDownObject.corner.Parent = DropDownObject.button
@@ -759,9 +862,12 @@ function self:NewDropDown(data)
 end
   return dropdown
 end
+-- edit tab elment after creating it (e.g adding tab name as first section)
+self:NewSection({Name = data.Name},24)
 
 return self
 -- end of the function
 end
+
 
 return Window
