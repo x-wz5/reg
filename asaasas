@@ -912,68 +912,65 @@ section.Corner.CornerRadius = UDim.new(0,6)
 end
 
 function self:NewDropDown(data)
-  --[[
-  data: Name: String,Callback: function
-  data2 Name: String
-  ]]
   assert(type(data.Name) == "string","Error: data.Name Expected string type, got: "..type(data.Name))
   assert(type(data.Callback) == "function","Error: data.Callback Expected function, got: "..type(data.Callback))
   
   local dropdown = setmetatable({},DropDown)
   
-  dropdown.DropDownBtn = Instance.new("TextButton")
-  dropdown.DropDownFrame = Instance.new("ScrollingFrame")
-  dropdown.DropDownText = Instance.new("TextLabel")
-  dropdown.List = Instance.new("UIListLayout")
-  dropdown.Corner = Instance.new("UICorner")
-  dropdown.Corner2 = Instance.new("UICorner")
-  dropdown.DropDownBtn.Parent = self.TabFrame
-  dropdown.DropDownFrame.Parent = dropdown.DropDownBtn
-  dropdown.DropDownText.Parent = dropdown.DropDownBtn 
+  local DropDownBtn = Instance.new("TextButton")
+  local DropDownFrame = Instance.new("ScrollingFrame")
+  local DropDownText = Instance.new("TextLabel")
+  local List = Instance.new("UIListLayout")
+  local Corner = Instance.new("UICorner")
+  local Corner2 = Instance.new("UICorner")
+  DropDownBtn.Parent = self.TabFrame
+  DropDownFrame.Parent = DropDownBtn
+  DropDownText.Parent = DropDownBtn 
   
-  dropdown.DropDownBtn.Size = Sizes.DropDowns
-  dropdown.DropDownBtn.Text "Drop down"
-  dropdown.DropDownBtn.Font = Enum.Font.DenkOne
-  dropdown.DropDownBtn.Font = Enum.Font.DenkOne
-  dropdown.DropDownBtn.TextSize = 14
-  dropdown.DropDownBtn.TextColor3 = NightModeColors.TextColor
-  dropdown.DropDownBtn.Name = "a"
-  dropdown.DropDownBtn.TextXAlignment = Enum.TextXAlignment.Left
+  DropDownBtn.Size = Sizes.DropDowns
+  DropDownBtn.Text = ""
+  DropDownBtn.Font = Enum.Font.DenkOne
+  DropDownBtn.BackgroundColor3 = NightModeColors.ButtonsColor
+  DropDownBtn.TextSize = 14
+  DropDownBtn.TextColor3 = NightModeColors.TextColor
+  DropDownBtn.Name = "a"
+  DropDownBtn.TextXAlignment = Enum.TextXAlignment.Left
   
-  dropdown.DropDownFrame.Size = UDim2.new(0.3,0,0,0)
-  dropdown.DropDownFrame.Position = UDim2.new(0.7,0,1,0)
-  dropdown.DropDownFrame.ZIndex = 9999
-  dropdown.DropDownFrame.Visible = false
+  DropDownFrame.Size = UDim2.new(0.5,0,0,0)
+  DropDownFrame.Position = UDim2.new(0.7,0,1,0)
+  DropDownFrame.Visible = false
+  DropDownFrame.BackgroundColor3 = NightModeColors.MainFrameColor
   
-  dropdown.DropDownText.Size = UDim2.new(0.3,0,1,0)
-  dropdown.DropDownText.BackgroundTransparency = 1
-  dropdown.DropDownText.Text = data.Name
-  dropdown.DropDownText.Font = Enum.Font.DenkOne
-  dropdown.DropDownText.TextSize = 14
-  dropdown.DropDownText.TextColor3 = NightModeColors.TextColor
-  dropdown.DropDownText.TextXAlignment = Enum.TextXAlignment.Left
-  dropdown.Corner.Parent = dropdown.DropDownBtn
-  dropdown.Corner.CornerRadius = UDim.new(0,6)
+  DropDownText.Size = UDim2.new(0.3,0,1,0)
+  DropDownText.BackgroundTransparency = 1
+  DropDownText.Text = data.Name
+  DropDownText.Font = Enum.Font.DenkOne
+  DropDownText.TextSize = 14
+  DropDownText.TextColor3 = NightModeColors.TextColor
+  DropDownText.TextXAlignment = Enum.TextXAlignment.Left
   
-  dropdown.Corner2.Parent = dropdown.DropDownFrame
-  dropdown.Corner2.CornerRadius = UDim.new(0,6)
+  Corner.Parent = DropDownBtn
+  Corner.CornerRadius = UDim.new(0,6)
   
-  dropdown.List.Parent = dropdown.DropDownFrame
+  Corner2.Parent = DropDownFrame
+  Corner2.CornerRadius = UDim.new(1,9)
   
-  local close = TweenService:Create(dropdown.DropDownFrame,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{Size = UDim2.new(0.3,0,0,0)})
-  local open = TweenService:Create(dropdown.DropDownFrame,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{Size = UDim2.new(0.3,0,0,200)})
+  List.Parent = DropDownFrame
+  
+  local close = TweenService:Create(DropDownFrame,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{Size = UDim2.new(0.3,0,0,0)})
+  local open = TweenService:Create(DropDownFrame,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{Size = UDim2.new(0.3,0,0,200)})
   local Opened = false
-  dropdown.DropDownBtn.MouseButton1Click:Connect(function()
+  DropDownBtn.MouseButton1Click:Connect(function()
       if Opened then
           close:Play()
           Opened = false
           task.wait(0.3)
-          dropdown.DropDownFrame.Visible = false
+          DropDownFrame.Visible = false
       else
-        dropdown.DropDownFrame.Visible = true
+          DropDownFrame.Visible = true
           open:Play()
+          task.wait(0.3)
           Opened = true
-          
       end
   end)
   function dropdown:NewObject(data2)
@@ -985,7 +982,7 @@ function self:NewDropDown(data)
   DropDownObject.button = Instance.new("TextButton")
   DropDownObject.corner = Instance.new("UICorner")
   
-  DropDownObject.button.Parent = dropdown.DropDownFrame
+  DropDownObject.button.Parent = DropDownFrame
   DropDownObject.button.Size = UDim2.new(1,0,0.1,0)
   DropDownObject.button.BackgroundColor3 = Color3.fromRGB(0,0,0)
   DropDownObject.button.ZIndex = 99999
@@ -1001,11 +998,11 @@ function self:NewDropDown(data)
   
   DropDownObject.button.MouseButton1Click:Connect(function()
       close:Play()
-      dropdown.DropDownText.Text = DropDownObject.button.Text
+       DropDownText.Text = DropDownObject.button.Text
       Opened = false
-      data.Callback(dropdown.DropDownText.Text)
+      data.Callback( DropDownText.Text)
       task.wait(0.3)
-      dropdown.DropDownFrame.Visible = false
+      DropDownFrame.Visible = false
     end)
   
   return DropDownObject
@@ -1018,6 +1015,5 @@ self:NewSection({Name = data.Name},24)
 return self
 -- end of the function
 end
-
 
 return Window
