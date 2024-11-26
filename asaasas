@@ -5,6 +5,18 @@
     Data:
       Name: String
     
+    Window:Notify({
+    	Duration = 3,
+    	Title  = "You have to be a Murder! and something else must happen",
+    	Info = "To use auto win and win other rounds too!",
+    	ColorText = {
+    		Text = "You have to be a Murder!",
+    		TitleColor = Color3.fromRGB(255,0,0),
+    		Text2 = nil,
+    		InfoColor = nil
+    	}
+    })
+    
     Window:NewTab:
     Paramter 1 = Data: table
     Data:
@@ -262,8 +274,12 @@ local NightModeColors = {
     MainFrameColor = Color3.fromRGB(30, 30, 30),        -- Slight contrast with the background
     ButtonsColor = Color3.fromRGB(50, 50, 50),          -- Darker, consistent button shade
     OffToggleStat = Color3.fromRGB(40, 40, 40),         -- Slightly darker toggle off state
-    ToggleContainer = Color3.fromRGB(30,30,30),
+    ToggleContainer = Color3.fromRGB(30, 30, 30),
     TextColor = Color3.fromRGB(230, 230, 230),          -- Light gray for optimal readability
+    NotifyBackground = Color3.fromRGB(44, 47, 46),      -- Subtle, neutral dark gray for notifications
+    NotifyTitleTextColor = Color3.fromRGB(255, 255, 255), -- Bright white for title text
+    NotifyInfoTextColor = Color3.fromRGB(200, 200, 200), -- Light gray for information text
+    NotifyBorderColor = Color3.fromRGB(60, 60, 60),      -- Slightly lighter gray for borders (optional)
     SlidersFillColor = {
         Color3.fromRGB(0, 255, 255), -- Vibrant cyan for slider fill
         Color3.fromRGB(120, 120, 120) -- Softer gray for slider text
@@ -276,11 +292,16 @@ local LightModeColors = {
     ButtonsColor = Color3.fromRGB(210, 210, 210),       -- Distinct buttons with neutral tone
     OffToggleStat = Color3.fromRGB(200, 200, 200),      -- Slightly darker toggle off state
     TextColor = Color3.fromRGB(60, 60, 60),             -- Darker gray for readability
+    NotifyBackground = Color3.fromRGB(255, 255, 255),   -- Pure white for notifications
+    NotifyTitleTextColor = Color3.fromRGB(0, 0, 0),     -- Solid black for title text
+    NotifyInfoTextColor = Color3.fromRGB(80, 80, 80),   -- Medium gray for information text
+    NotifyBorderColor = Color3.fromRGB(200, 200, 200),  -- Light gray for borders (optional)
     SlidersFillColor = {
         Color3.fromRGB(0, 255, 255), -- Cyan for slider fill
         Color3.fromRGB(30, 30, 30)   -- Dark gray for slider text
     }
 }
+
 
 local Sizes = {
 	Buttons = UDim2.new(1, 0, 0.10, 0),
@@ -476,6 +497,135 @@ local Mode = settings:NewButton({
 	end
 })
 
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0.2, 0, 1, 0)
+frame.Position = UDim2.new(0.8, 0, 0, 0)
+frame.ClipsDescendants = true -- Ensures items don't appear outside
+frame.Parent = self.Sg
+frame.BackgroundTransparency = 1
+
+local instances = {}
+local Padding = 20
+
+function EasyTween(object, prop, value, style)
+    local info = style or TweenInfo.new(0.3, Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
+    local Tween = TweenService:Create(object, info, {
+        [prop] = value
+    })
+    Tween:Play() 
+end
+
+function findKeyIndex(array, key)
+    for index, value in ipairs(array) do
+        if value == key then
+            return index
+        end
+    end
+    return nil
+end
+
+function updatePositions()
+    -- Re-tween all remaining instances
+    for i, instance in ipairs(instances) do
+        local targetY = 1 - ((i * (50 + Padding)) / frame.AbsoluteSize.Y)
+        local tween = TweenService:Create(
+            instance,
+            TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {Position = UDim2.new(0, 0, targetY, 0)}
+        )
+        tween:Play()
+    end
+end
+
+function Color3ToHex(color)
+    -- Ensure the RGB values are scaled properly from 0-1 to 0-255
+    local r = math.clamp(math.floor(color.R * 255), 0, 255)
+    local g = math.clamp(math.floor(color.G * 255), 0, 255)
+    local b = math.clamp(math.floor(color.B * 255), 0, 255)
+    
+    -- Format as a HEX string
+    return string.format("#%02X%02X%02X", r, g, b)
+end
+
+
+
+function self:Notify(data)
+	if data.ColorText then
+        local info = data.ColorText
+        if info.TitleColor and info.Text then
+            local TitleColor = info.TitleColor
+            local Text = info.Text
+            local Converted = Color3ToHex(TitleColor)
+            data.Title = data.Title:gsub(Text, '<font color="' .. Converted .. '">' .. Text .. "</font>")
+        end
+        if info.InfoColor and info.Text2 then
+            local InfoColor = info.InfoColor
+            local Text2 = info.Text2
+            local Converted = Color3ToHex(InfoColor)
+            data.Info = data.Info:gsub(Text2, '<font color="' .. Converted .. '">' .. Text2 .. "</font>")
+        end
+    end
+
+    -- Create the new instances
+    local NotifyMain = Instance.new("Frame")
+    NotifyMain.Size = UDim2.new(0.7, 0, 0.2, 0)
+    NotifyMain.Position = UDim2.new(0.3, 0, 1, 0) -- Start off-screen at the bottom
+    NotifyMain.BackgroundTransparency = 0
+    NotifyMain.Parent = frame
+    NotifyMain.BackgroundColor3 = Color3.fromRGB(44, 47, 46)
+
+    local UICorner = Instance.new("UICorner")
+    UICorner.Parent = NotifyMain
+    UICorner.CornerRadius = UDim.new(0, 9)
+
+    local Title = Instance.new("TextLabel")
+    Title.Parent = NotifyMain
+    Title.TextSize = 16
+    Title.TextScaled = true
+    Title.Position = UDim2.new(0.06, 0, 0, 5)
+    Title.Size = UDim2.new(0.92, 0, 0.4, 0)
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.BackgroundTransparency = 1
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Text = data.Title
+    Title.RichText = true
+
+    local Info = Instance.new("TextLabel")
+    Info.Parent = NotifyMain
+    Info.TextSize = 6
+    Info.TextWrapped = true
+    Info.Position = UDim2.new(0.06, 0, 0.4, 0)
+    Info.Size = UDim2.new(0.92, 0, 0.5, 0)
+    Info.BackgroundTransparency = 1
+    Info.TextXAlignment = Enum.TextXAlignment.Left
+    Info.TextColor3 = Color3.fromRGB(169, 169, 169)
+    Info.Text = data.Info
+    Info.RichText = true
+    
+    -- Add the new instance to the table
+    table.insert(instances, NotifyMain)
+
+    -- Animate all instances upwards
+    updatePositions()
+
+    -- Remove instance after the specified duration
+    task.spawn(function()
+        task.wait(data.Duration)
+        local index = findKeyIndex(instances, NotifyMain)
+        if index then
+            table.remove(instances, index)
+            for _,ch in pairs(NotifyMain:GetChildren()) do
+            	if ch:IsA("TextLabel") then
+            		EasyTween(ch, "TextTransparency", 1)
+            	end
+            end
+            EasyTween(NotifyMain, "BackgroundTransparency", 1)
+            task.wait(0.3)
+            updatePositions()
+            NotifyMain:Destroy()
+        end
+    end)
+end
 
 return self
 end
