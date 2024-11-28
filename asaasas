@@ -412,28 +412,7 @@ function findKeyIndex(array, key)
     return nil
 end
 
-function updatePositions()
-    -- Re-tween all remaining instances
-    for i, instance in ipairs(instances) do
-        local targetY = 1 - ((i * (50 + Padding)) / frame.AbsoluteSize.Y)
-        local tween = TweenService:Create(
-            instance,
-            TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-            {Position = UDim2.new(0, 0, targetY, 0)}
-        )
-        tween:Play()
-    end
-end
 
-function Color3ToHex(color)
-    -- Ensure the RGB values are scaled properly from 0-1 to 0-255
-    local r = math.clamp(math.floor(color.R * 255), 0, 255)
-    local g = math.clamp(math.floor(color.G * 255), 0, 255)
-    local b = math.clamp(math.floor(color.B * 255), 0, 255)
-    
-    -- Format as a HEX string
-    return string.format("#%02X%02X%02X", r, g, b)
-end
 
 
 
@@ -550,6 +529,29 @@ frame.Position = UDim2.new(0.8, 0, 0, 0)
 frame.ClipsDescendants = true -- Ensures items don't appear outside
 frame.Parent = self.Sg
 frame.BackgroundTransparency = 1
+
+function updatePositions()
+    -- Re-tween all remaining instances
+    for i, instance in ipairs(instances) do
+        local targetY = 1 - ((i * (50 + Padding)) / frame.AbsoluteSize.Y)
+        local tween = TweenService:Create(
+            instance,
+            TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {Position = UDim2.new(0, 0, targetY, 0)}
+        )
+        tween:Play()
+    end
+end
+
+function Color3ToHex(color)
+    -- Ensure the RGB values are scaled properly from 0-1 to 0-255
+    local r = math.clamp(math.floor(color.R * 255), 0, 255)
+    local g = math.clamp(math.floor(color.G * 255), 0, 255)
+    local b = math.clamp(math.floor(color.B * 255), 0, 255)
+    
+    -- Format as a HEX string
+    return string.format("#%02X%02X%02X", r, g, b)
+end
 
 function self:Notify(data)
 	if data.ColorText then
