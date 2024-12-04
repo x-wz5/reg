@@ -70,7 +70,7 @@ local KeySystem = false
 
 local TweenStyle = TweenInfo.new(0.30,Enum.EasingStyle.Exponential)
 
-if not Allowed[plr.Name] or not KeySystem then
+if not Allowed[plr.Name] and KeySystem then
 
   if game:GetService("CoreGui"):FindFirstChild("Key System") then
     game:GetService("CoreGui"):FindFirstChild("Key System"):FindFirstChild("Key TextBox",true).Text = "Already Send Key"
