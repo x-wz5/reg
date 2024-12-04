@@ -66,10 +66,11 @@ local Character = plr.Character
 local Allowed = {
   ["Quake_Hub"] = true
 }
+local KeySystem = false
 
 local TweenStyle = TweenInfo.new(0.30,Enum.EasingStyle.Exponential)
 
-if not Allowed[plr.Name] then
+if not Allowed[plr.Name] or not KeySystem then
 
   if game:GetService("CoreGui"):FindFirstChild("Key System") then
     game:GetService("CoreGui"):FindFirstChild("Key System"):FindFirstChild("Key TextBox",true).Text = "Already Send Key"
@@ -728,7 +729,6 @@ self.TabBtn.MouseButton1Click:Connect(function()
 				elseif element:IsA("TextLabel") then
 					EasyTween(element,"TextTransparency",0)
 				end
-				task.wait()
 			end
 			v.Visible = true
 		end
