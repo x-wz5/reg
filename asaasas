@@ -516,7 +516,7 @@ local function tweenColor(textLabel, text, duration)
     while true do
         local elapsed = tick() - startTime
         if elapsed > duration then break end
-
+				print("tween")
         local t = elapsed / duration
         local r = lerp(255, 0, t)
         local g = lerp(0, 255, t)
