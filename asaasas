@@ -64,14 +64,33 @@ local TweenService = game:GetService("TweenService")
 local Mouse = plr:GetMouse()
 local Character = plr.Character
 local Allowed = {
-  ["Quake_Hub"] = true
+  ["Quake_Hub"] = true,
+  ["Tiger_hub3"] = true
 }
+
 local KeySystem = true
 
 local TweenStyle = TweenInfo.new(0.30,Enum.EasingStyle.Exponential)
 
+local function toTimestamp(year, month, day, hour)
+    return os.time({
+        year = year,
+        month = month,
+        day = day,
+        hour = hour or 0,
+        min = 0,
+        sec = 0,
+    })
+end
+
+local keys = {
+	["cuwhYtcZ^^*"] = toTimestamp(0,0,7,0)
+	
+}
+
+
 if not Allowed[plr.Name] and KeySystem then
-print("Key system enabled")
+
   if game:GetService("CoreGui"):FindFirstChild("Key System") then
     game:GetService("CoreGui"):FindFirstChild("Key System"):FindFirstChild("Key TextBox",true).Text = "Already Send Key"
     return
@@ -154,18 +173,6 @@ function newKey()
     return key
 end
 
--- Convert structured time (year, month, day, hour) to a timestamp
-local function toTimestamp(year, month, day, hour)
-    return os.time({
-        year = year,
-        month = month,
-        day = day,
-        hour = hour or 0,
-        min = 0,
-        sec = 0,
-    })
-end
-
 -- Store key with expiration date
 
 local function storeSecureKey(key, duration, secretKey)
@@ -194,12 +201,20 @@ end
 -- Validate the key and check its expiration
 local function validateSecureKey(inputKey, existing, secretKey)
     if isfile("tiger-hub.txt") then
-        local data = HttpService:JSONDecode(readfile("tiger-hub.txt"))
+        local s,data = pcall(function() return HttpService:JSONDecode(readfile("tiger-hub.txt")) end)
         local inputHash = existing == false and crypt.hash(inputKey, "sha256") or inputKey
         
         -- Verify signature integrity
         
-        local expectedSignature = crypt.hash(data.hash .. tostring(data.expires) .. secretKey, "sha256")
+        local expectedSignature = crypt.hash(
+        	data.hash
+        	.. 
+        	tostring(data.expires)
+        	.. 
+        	secretKey
+        	, 
+        	"sha256")
+        
        
         if expectedSignature ~= data.signature then
         	error("Tampered data detected.\n any attempt to bypass the key system will result a blacklist!")
@@ -240,15 +255,17 @@ local function checkOrGenerateKey()
 
     -- Generate a new key if no valid key exists
     local generatedKey = newKey()
-    storeSecureKey(generatedKey, { Days = 1, Hours = 0 }, secretKey)
     return generatedKey
 end
 
 -- Example Usage
 local activeKey,i = checkOrGenerateKey()
 
-local isValid,m = validateSecureKey(activeKey,i,secretKey)
-
+local s,data = pcall(function() return HttpService:JSONDecode(readfile("tiger-hub.txt")) end)
+local isValid,m
+if s then
+	isValid,m = validateSecureKey(activeKey,i,secretKey)
+end
 if not isValid then
 	sendKey(activeKey)
   
@@ -331,7 +348,9 @@ if not isValid then
   -- Validation
   TextButton.MouseButton1Click:Connect(function()
       DidSubmit = true
-      if validateSecureKey(TextBox.Text,secretKey) then
+      print(TextBox.Text == activeKey)
+      if TextBox.Text == activeKey then
+      	storeSecureKey(activeKey, { Days = 1, Hours = 0 }, secretKey)
           print("Validation success!")
           TextBox.Text = "Key Valid!"
           TextBox.TextColor3 = Color3.new(0, 1, 0)
@@ -510,25 +529,46 @@ local function tweenColor(textLabel, text, duration)
     local startTime = tick()
 
     local function lerp(a, b, t)
-        return a + (b - a) * t
+        return math.floor(a + (b - a) * t + 0.5)
     end
 
-    while true do
-        local elapsed = tick() - startTime
-        if elapsed > duration then break end
-				print("tween")
-        local t = elapsed / duration
-        local r = lerp(255, 0, t)
-        local g = lerp(0, 255, t)
-        local b = lerp(0, 0, t)
-        
-        local escapedText = text:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]", "%%%1") -- Escape special characters
-        textLabel.Text = textLabel.Text:gsub(escapedText, string.format('<font color="rgb(%d,%d,%d)">%s</font>', r, g, b, text))
-        textLabel.RichText = true
+    task.spawn(function()
+        local originalText = textLabel.Text
+        local cycleCount = 0
+        local i = 1
+        while duration >= i do
+        	print(i)
+            local elapsed = tick() - startTime
+            if elapsed > duration then
+                startTime = tick()  -- Reset timer when maximum RGB reached
+                cycleCount = cycleCount + 1
+            end
 
-        task.wait() -- Wait a frame
-    end
+            local t = math.clamp(elapsed / duration, 0, 25)
+
+            local r, g, b
+            if cycleCount % 3 == 0 then
+                r = lerp(255, 0, t)
+                g = lerp(0, 255, t)
+                b = lerp(0, 0, t)
+            elseif cycleCount % 3 == 1 then
+                r = lerp(0, 255, t)
+                g = lerp(255, 0, t)
+                b = lerp(0, 0, t)
+            else
+                r = lerp(0, 0, t)
+                g = lerp(0, 255, t)
+                b = lerp(255, 0, t)
+            end
+
+            task.wait(0.03)
+            i = i  + (0.03)
+            local newText = string.format('<font color="rgb(%d,%d,%d)">'..text..'</font>', r, g, b)
+            textLabel.Text = originalText:gsub(text, newText)
+        end
+    end)
 end
+
 
 
 function Window.new(data)
@@ -722,7 +762,7 @@ function self:Notify(data)
     Info.RichText = true
     
     if data.ColorText.RGB then
-    	tweenColor(Info,data.ColorText.RGBtext,data.ColorText.RGBDuration or 3)
+    	tweenColor(Info, data.ColorText.RGBtext, data.ColorText.RGBDuration or 3)
    end
     
     -- Add the new instance to the table
@@ -1005,7 +1045,7 @@ function self:NewSlider(data)
     slider.Trigger.BackgroundColor3 = Color3.fromRGB(230,230,230)
     slider.Trigger.Text = ""
     slider.Trigger.Size = UDim2.new(0.025, 0, 0.42, 0)
-    slider.Trigger.Position = UDim2.new(slider.Fill.Position.X.Scale, slider.Fill.Position.X.Offset,0.3,1.5)
+    slider.Trigger.Position = UDim2.new(slider.outputValue, slider.Fill.Position.X.Offset,0.3,1.5)
     slider.Trigger.MouseButton1Down:Connect(function()
         slider:ActivateSlider() 
     end)
