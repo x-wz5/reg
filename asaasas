@@ -522,8 +522,9 @@ local function tweenColor(textLabel,text, duration)
         local r = lerp(255, 0, t)
         local g = lerp(0, 255, t)
         local b = lerp(0, 0, t)
-
-        textLabel.Text = string.format('<font color="rgb(%d,%d,%d)">Your Text</font>', r, g, b)
+        local txt = textLabel.Text
+        
+        textLabel.Text = txt:gsub(text,string.format('<font color="rgb(%d,%d,%d)"></font>', r, g, b))
         textLabel.RichText = true
     end)
 end
