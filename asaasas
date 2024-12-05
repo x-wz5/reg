@@ -508,23 +508,28 @@ end
 
 local runService = game:GetService("RunService")
 
-local function tweenColor(textLabel,text, duration)
+local function tweenColor(textLabel, text, duration)
     local startTime = tick()
+    local connection
+
     local function lerp(a, b, t)
         return a + (b - a) * t
     end
 
-    runService.RenderStepped:Connect(function()
+    connection = runService.RenderStepped:Connect(function()
         local elapsed = tick() - startTime
-        if elapsed > duration then return end
+        if elapsed > duration then
+            connection:Disconnect()
+            return
+        end
 
         local t = elapsed / duration
         local r = lerp(255, 0, t)
         local g = lerp(0, 255, t)
         local b = lerp(0, 0, t)
-        local txt = textLabel.Text
         
-        textLabel.Text = txt:gsub(text,string.format('<font color="rgb(%d,%d,%d)">%s</font>', r, g, b, text))
+        local escapedText = text:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]", "%%%1") -- Escape special characters
+        textLabel.Text = textLabel.Text:gsub(escapedText, string.format('<font color="rgb(%d,%d,%d)">%s</font>', r, g, b, text))
         textLabel.RichText = true
     end)
 end
