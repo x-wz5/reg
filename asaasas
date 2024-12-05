@@ -506,22 +506,16 @@ function findKeyIndex(array, key)
 end
 
 
-local runService = game:GetService("RunService")
-
 local function tweenColor(textLabel, text, duration)
     local startTime = tick()
-    local connection
 
     local function lerp(a, b, t)
         return a + (b - a) * t
     end
 
-    connection = runService.RenderStepped:Connect(function()
+    while true do
         local elapsed = tick() - startTime
-        if elapsed > duration then
-            connection:Disconnect()
-            return
-        end
+        if elapsed > duration then break end
 
         local t = elapsed / duration
         local r = lerp(255, 0, t)
@@ -531,10 +525,10 @@ local function tweenColor(textLabel, text, duration)
         local escapedText = text:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]", "%%%1") -- Escape special characters
         textLabel.Text = textLabel.Text:gsub(escapedText, string.format('<font color="rgb(%d,%d,%d)">%s</font>', r, g, b, text))
         textLabel.RichText = true
-    end)
+
+        task.wait() -- Wait a frame
+    end
 end
-
-
 
 
 function Window.new(data)
