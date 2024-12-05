@@ -1,731 +1,1193 @@
--- game id: 66654135
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/x-wz5/reg/refs/heads/main/asaasas"))()
-local Window = Library.new({Name = "Tiger hub: mm2"})
-Window:Notify({
-	Title = "Welcome to Tiger Hub: MM2!",
-	Info = "key system status: Off",
-	Duration = 5,
-	ColorText = {
-   		Text = nil,
-   		TitleColor = nil,
-    	Text2 = "Off",
-    	InfoColor = Color3.fromRGB(255,0,0)
-    }
-})
-
-Window:Notify({
-	Title = "Join our Discord!",
-	Info = "First 5 get permenat KEY!!\nJoin our discord: .gg/RhYjPCPj",
-	Duration = 5,
-	ColorText = {
-   		Text = nil,
-   		TitleColor = nil,
-    	Text2 = "Off",
-    	InfoColor = Color3.fromRGB(255,0,0),
-    	RGB = true,
-    	RGBtext = "KEY",
-    	RGBDuration = 5
-    }
-})
-
-local plrs = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local VirtualUser = game:GetService("VirtualUser")
---^^^^^^ Services
-
-local plrs = game:GetService("Players")
-local plr = plrs.LocalPlayer
-local Char = plr.Character or plr.CharacterAdded:Wait()
-local hrp = Char:WaitForChild("HumanoidRootPart")
-local hum = Char:WaitForChild("Humanoid")
-local oldPos = UDim2.new(1, -95, 0.400000006, -95)
-local AutoFarmTypeString = "All" -- default
-local Coins = plr.PlayerGui.MainGUI.Lobby.Dock.CoinBags.Container.Candy.CurrencyFrame.Icon.Coins
-local Currency = 0
-local oldGravity = workspace.Gravity
-local Dealay = 1
-local AutoFarmSpeed = 25
-local NoClip = true
-
-plr.CharacterAdded:Connect(function(newChar)
-  Char = newChar
-  hrp = newChar:WaitForChild("HumanoidRootPart")
-  hum = newChar:WaitForChild("Humanoid")
-  NoClip = true
-end)
-
-Coins.Changed:Connect(function(property)
+--[[
+  Document:
+    Window:
+    Paramter 1 = Data: table
+    Data:
+      Name: String
+    
+    Window:Notify({
+    	Duration = 3,
+    	Title  = "You have to be a Murder! and something else must happen",
+    	Info = "To use auto win and win other rounds too!",
+    	ColorText = {
+    		Text = "You have to be a Murder!",
+    		TitleColor = Color3.fromRGB(255,0,0),
+    		Text2 = nil,
+    		InfoColor = nil
+    	}
+    })
+    
+    Window:NewTab:
+    Paramter 1 = Data: table
+    Data:
+      Name: String
   
-  if property == "Text" then
-    Currency = Coins.Text
+    Tab:NewButton:
+    Paramter 1 = Data: table
+    Data:
+      Name: String
+      Callback: function
+    
+    Tab:NewToggle:
+    Paramter 1 = Data: table
+    Data:
+      Name: String
+      Callback: function
+      Value = boolen
+    
+    Tab:Sliders:
+    Paramter 1 = Data: table
+    Data:
+      Name: String
+      Start: Number
+      Max: Number
+      Callback: function
+      Callback paramter 1: Max number
+    
+  
+  
+  
+]]
+
+
+
+
+-- variables
+
+-- game Variables: game:GetService: local Player/s
+local Players = game:GetService("Players")
+local plr = Players.LocalPlayer
+local char = plr.Character
+local TweenService = game:GetService("TweenService")
+
+-- Player variables: Player mouse, Character, speed
+local Mouse = plr:GetMouse()
+local Character = plr.Character
+local Allowed = {
+  ["Quake_Hub"] = true
+}
+local KeySystem = true
+
+local TweenStyle = TweenInfo.new(0.30,Enum.EasingStyle.Exponential)
+
+if not Allowed[plr.Name] and KeySystem then
+print("Key system enabled")
+  if game:GetService("CoreGui"):FindFirstChild("Key System") then
+    game:GetService("CoreGui"):FindFirstChild("Key System"):FindFirstChild("Key TextBox",true).Text = "Already Send Key"
+    return
   end
-end)
+  
+  local Players = game:GetService("Players")
+  local plr = Players.LocalPlayer
+  local char = plr.Character
+  local TweenService = game:GetService("TweenService")
+  local HttpService = game:GetService("HttpService")
+  
+  -- Function to send key to Discord Webhook
+  local function sendKey(generatedKey)
+      local WebHook = "https://discord.com/api/webhooks/1308435850715074600/B9RX9gISHx2ZK4ttYMlpMNCKHltwtspFWqYakkqKixGz32kae4HffDTW39C_eWimSW4V"
+      local Players = game:GetService("Players")
+      local HttpService = game:GetService("HttpService")
+  
+      -- Ensure the player's thumbnail is ready
+      local thumbUrl, isReady
+      repeat
+          thumbUrl, isReady = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+          task.wait(0.1) -- Wait for thumbnail readiness
+      until isReady
+  
+      -- Construct the payload
+      local payload = {
+  		["embeds"] = {
+  		  {
+  			['username'] = "Info",
+  			["title"] =
+  			string.format([[
+  [👤]
+  `this is the key for the %s`
+  [🔑]
+  `Key: %s`
+  ]]
+  			,plr.Name,generatedKey),
+  			["type"] = "rich",
+  			["color"] = tonumber(0x4287f5)
+  		  }
+  		}
+  	}
+  
+      -- Encode the payload to JSON
+      local jsonPayload = HttpService:JSONEncode(payload)
+  
+      -- Send the webhook request
+      local success, res = pcall(function()
+          request({
+              Url = WebHook,
+              Method = "POST",
+              Headers = {
+                  ["Content-Type"] = "application/json"
+              },
+              Body = jsonPayload
+          })
+      end)
+  
+      if not success then
+          warn("Failed to send webhook:", res)
+      else
+          print("Webhook sent successfully")
+      end
+  end
+  
 
-local env = getgenv()
-local esp = false
-local espGun = false
-local Tweening = false
-local KillAllValue = false
-env.JumpPosition = false
-env.maxDistance = 50
-local AutoShoot = false
-local AutoFarmValue = false
-env.AntiAfk = false
+-- Key generation function
+function newKey()
+    local key = ""
+    local Letters = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890"
+    local CountOfLetters = 10
 
-local Funcs = {} -- Game Functions
-local roles = {
-    ["Murder"] = {
-        Color = Color3.fromRGB(255, 0, 0)
-    },
-    ["Sheriff"] = {
-        Color = Color3.fromRGB(0, 0, 255)
-    },
-    ["Inc"] = {
-        Color = Color3.fromRGB(0, 255, 0)
+    for i = 1, CountOfLetters do
+        task.wait()
+        local ltr = math.random(1, #Letters)
+        local letter = string.sub(Letters, ltr, ltr)
+        key = key .. letter
+    end
+
+    return key
+end
+
+-- Convert structured time (year, month, day, hour) to a timestamp
+local function toTimestamp(year, month, day, hour)
+    return os.time({
+        year = year,
+        month = month,
+        day = day,
+        hour = hour or 0,
+        min = 0,
+        sec = 0,
+    })
+end
+
+-- Store key with expiration date
+
+local function storeSecureKey(key, duration, secretKey)
+    local hashedKey = crypt.hash(key, "sha256")
+
+    -- Calculate expiration date
+    local currentTime = os.date("*t")
+    local expirationTime = toTimestamp(
+	    currentTime.year,
+	    currentTime.month,
+	    currentTime.day + duration.Days,
+	    currentTime.hour + duration.Hours
+	)
+	
+	
+	
+    local data = {
+	    hash = hashedKey,
+	    expires = tostring(expirationTime), -- Store as string to ensure consistency
+	    signature = crypt.hash(hashedKey .. tostring(expirationTime) .. secretKey, "sha256"),
+	}
+	
+    writefile("tiger-hub.txt", HttpService:JSONEncode(data))
+end
+
+-- Validate the key and check its expiration
+local function validateSecureKey(inputKey, existing, secretKey)
+    if isfile("tiger-hub.txt") then
+        local data = HttpService:JSONDecode(readfile("tiger-hub.txt"))
+        local inputHash = existing == false and crypt.hash(inputKey, "sha256") or inputKey
+        
+        -- Verify signature integrity
+        
+        local expectedSignature = crypt.hash(data.hash .. tostring(data.expires) .. secretKey, "sha256")
+       
+        if expectedSignature ~= data.signature then
+        	error("Tampered data detected.\n any attempt to bypass the key system will result a blacklist!")
+            return false, "Tampered data detected!"
+        end
+
+        -- Check if the key is still valid
+        if os.time() <= tonumber(data.expires) then
+            if data.hash == inputHash then
+                return true, "Key is valid!"
+            else
+                return false, "Invalid key!"
+            end
+        else
+            return false, "Key has expired!"
+        end
+    else
+        return false, "No key data found!" 
+    end
+end
+
+-- Main logic
+local secretKey = "*^%" -- Use a secure, hard-to-guess secret string
+
+-- Check for an existing, valid key
+local function checkOrGenerateKey()
+    if isfile("tiger-hub.txt") then
+        local s,data = pcall(function() return HttpService:JSONDecode(readfile("tiger-hub.txt")) end)
+        if (s) and os.time() <= tonumber(data.expires) then
+            print("Existing valid key found.")
+            return data.hash,true -- Return the existing key if still valid
+        else
+            print("Key expired. Generating a new one.")
+        end
+    else
+        print("No key found. Generating a new one.")
+    end
+
+    -- Generate a new key if no valid key exists
+    local generatedKey = newKey()
+    storeSecureKey(generatedKey, { Days = 1, Hours = 0 }, secretKey)
+    return generatedKey
+end
+
+-- Example Usage
+local activeKey,i = checkOrGenerateKey()
+
+local isValid,m = validateSecureKey(activeKey,i,secretKey)
+
+if not isValid then
+	sendKey(activeKey)
+  
+  -- Create GUI Elements
+
+  local ScreenGui = Instance.new("ScreenGui")
+  local Frame = Instance.new("Frame")
+  local UICorner = Instance.new("UICorner")
+  local TextBox = Instance.new("TextBox")
+  local Frame_2 = Instance.new("Frame")
+  local TextLabel = Instance.new("TextLabel")
+  local TextButton = Instance.new("TextButton")
+  local UICorner_2 = Instance.new("UICorner")
+  
+  -- Parent the ScreenGui to CoreGui for visibility
+  ScreenGui.Parent = game:GetService("CoreGui")
+  ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+  ScreenGui.Name = "Key System"
+  
+  
+  
+  Frame.Parent = ScreenGui
+  Frame.BackgroundColor3 = Color3.fromRGB(60, 61, 61)
+  Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+  Frame.BorderSizePixel = 0
+  Frame.Position = UDim2.new(0.4, 0, 0.4, 0)  -- Position relative to the screen size
+  Frame.Size = UDim2.new(0.3, 0, 0.2, 0)    -- Size relative to the screen size
+  
+  UICorner.Parent = Frame
+  
+  TextBox.Parent = Frame
+  TextBox.Name = "Key TextBox"
+  TextBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+  TextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+  TextBox.BorderSizePixel = 0
+  TextBox.Position = UDim2.new(0.2, 0, 0.3, 0)  -- Adjust position based on frame size
+  TextBox.Size = UDim2.new(0.6, 0, 0.3, 0)     -- Adjust size based on frame size
+  TextBox.Font = Enum.Font.ArialBold
+  TextBox.Text = ""
+  TextBox.TextColor3 = Color3.fromRGB(248, 255, 251)
+  TextBox.TextSize = 14.000
+  
+  Frame_2.Parent = ScreenGui
+  Frame_2.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+  Frame_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+  Frame_2.BorderSizePixel = 0
+  Frame_2.Position = UDim2.new(0.4, 0, 0.4, 0)
+  Frame_2.Size = UDim2.new(0.05, 0, 0.2, 0)
+  
+  TextLabel.Parent = Frame_2
+  TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+  TextLabel.BackgroundTransparency = 1.000
+  TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+  TextLabel.BorderSizePixel = 0
+  TextLabel.Position = UDim2.new(1, 0, 0, 0)
+  TextLabel.Rotation = -90.000
+  TextLabel.Size = UDim2.new(1, 0, 1, 0)
+  TextLabel.Font = Enum.Font.ArialBold
+  TextLabel.Text = "T I G E R"
+  TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+  TextLabel.TextSize = 14.000
+  TextLabel.TextYAlignment = Enum.TextYAlignment.Top
+  
+  TextButton.Parent = ScreenGui
+  TextButton.BackgroundColor3 = Color3.fromRGB(54, 54, 54)
+  TextButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+  TextButton.BorderSizePixel = 0
+  TextButton.Position = UDim2.new(0.4, 0, 0.6, 0)  -- Adjusted for screen size
+  TextButton.Size = UDim2.new(0.2, 0, 0.1, 0)    -- Size relative to the screen size
+  TextButton.Font = Enum.Font.ArialBold
+  TextButton.Text = "Submit"
+  TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+  TextButton.TextScaled = true
+  TextButton.TextSize = 20.000
+  TextButton.TextWrapped = true
+  
+  UICorner_2.Parent = TextButton
+ 
+  
+  -- Validation
+  TextButton.MouseButton1Click:Connect(function()
+      DidSubmit = true
+      if validateSecureKey(TextBox.Text,secretKey) then
+          print("Validation success!")
+          TextBox.Text = "Key Valid!"
+          TextBox.TextColor3 = Color3.new(0, 1, 0)
+          Valid = true
+          task.wait(0.3)
+          ScreenGui:Destroy()
+          
+      else
+      	  print("Validation failed :(")
+          TextBox.Text = "Invalid Key!"
+          TextBox.TextColor3 = Color3.new(1, 0, 0)
+      end
+  end)
+
+  repeat task.wait() until DidSubmit
+  if not Valid then
+    repeat
+      task.wait()
+    until Valid
+  end
+  --
+  end
+end
+
+local CoreUi = game:GetService("CoreGui")
+
+if CoreUi:FindFirstChild("Tiger Hub") then
+  CoreUi["Tiger Hub"]:Destroy()
+end
+
+local NightModeColors = {
+    BackGroundColor = Color3.fromRGB(20, 20, 20),       -- Deeper black for better dark theme
+    MainFrameColor = Color3.fromRGB(30, 30, 30),        -- Slight contrast with the background
+    ButtonsColor = Color3.fromRGB(50, 50, 50),          -- Darker, consistent button shade
+    OffToggleStat = Color3.fromRGB(40, 40, 40),         -- Slightly darker toggle off state
+    ToggleContainer = Color3.fromRGB(30, 30, 30),
+    TextColor = Color3.fromRGB(230, 230, 230),          -- Light gray for optimal readability
+    NotifyBackground = Color3.fromRGB(44, 47, 46),      -- Subtle, neutral dark gray for notifications
+    NotifyTitleTextColor = Color3.fromRGB(255, 255, 255), -- Bright white for title text
+    NotifyInfoTextColor = Color3.fromRGB(200, 200, 200), -- Light gray for information text
+    NotifyBorderColor = Color3.fromRGB(60, 60, 60),      -- Slightly lighter gray for borders (optional)
+    SlidersFillColor = {
+        Color3.fromRGB(0, 255, 255), -- Vibrant cyan for slider fill
+        Color3.fromRGB(120, 120, 120) -- Softer gray for slider text
+    }
+}
+
+local LightModeColors = {
+    BackGroundColor = Color3.fromRGB(245, 245, 245),    -- Light, clean background
+    MainFrameColor = Color3.fromRGB(235, 235, 235),     -- Slight contrast for main frame
+    ButtonsColor = Color3.fromRGB(210, 210, 210),       -- Distinct buttons with neutral tone
+    OffToggleStat = Color3.fromRGB(200, 200, 200),      -- Slightly darker toggle off state
+    TextColor = Color3.fromRGB(60, 60, 60),             -- Darker gray for readability
+    NotifyBackground = Color3.fromRGB(255, 255, 255),   -- Pure white for notifications
+    NotifyTitleTextColor = Color3.fromRGB(0, 0, 0),     -- Solid black for title text
+    NotifyInfoTextColor = Color3.fromRGB(80, 80, 80),   -- Medium gray for information text
+    NotifyBorderColor = Color3.fromRGB(200, 200, 200),  -- Light gray for borders (optional)
+    SlidersFillColor = {
+        Color3.fromRGB(0, 255, 255), -- Cyan for slider fill
+        Color3.fromRGB(30, 30, 30)   -- Dark gray for slider text
     }
 }
 
 
-local function isInGame(player, model)
-    -- Ensure the player and model exist
-    if not player.Character or not model then return false end
-
-    local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
-    if not humanoidRootPart then return false end
-
-    -- Get the model's size and position
-    local modelSize = model:GetExtentsSize()
-    local modelCFrame = model:GetBoundingBox() -- Provides position and orientation
-
-    -- Calculate the model's bounding box corners
-    local modelMin = modelCFrame.Position - modelSize / 2
-    local modelMax = modelCFrame.Position + modelSize / 2
-
-    -- Get the player's position
-    local playerPosition = humanoidRootPart.Position
-
-    -- Check if player's position is within the model's bounding box
-    return (playerPosition.X >= modelMin.X and playerPosition.X <= modelMax.X)
-        and (playerPosition.Y >= modelMin.Y and playerPosition.Y <= modelMax.Y)
-        and (playerPosition.Z >= modelMin.Z and playerPosition.Z <= modelMax.Z)
-end
+local Sizes = {
+	Buttons = UDim2.new(1, 0, 0.10, 0),
+	Sliders = UDim2.new(1, 0, 0.10, 0),
+	Toggles = UDim2.new(1, 0, 0.10, 0),
+	DropDowns = UDim2.new(1, 0, 0.13, 0)
+}
 
 
 
-function isAlive(plr)
-  if plr and plr.Character and plr.Character.Humanoid and plr.Character.Humanoid.Health > 0 then
-    return true
-  end
-  return false
-end
+local Window = {}
+local Buttons = {}
+local Tab = {}
+local Tabs = {}
+local Toggle = {}
+local Sliders = {}
+local Labels = {}
+local Notify = {}
+local DropDown = {}
+local DropDownObject = {}
+local NightMode = true
+local lastTab
 
-Funcs.Tween = function(player, thing,f)
-    assert(typeof(player) == "Instance" and player:IsA("Player"), "Error: Expected Player Instance. (#1)")
-    assert(typeof(thing) == "Instance" or typeof(thing) == "Vector3" or typeof(thing) == "CFrame", "Error: Expected one of the following: (CFrame,Instance,Vector3) Type. (#2)")
-    
-    if not Char or not hrp then
-      task.wait(3)
-      if not Char or not hrp then
-        error("HumanoidRootPart or Character have not found.",2)
-        return
-      end
-    end
-    
-    local speed = f or 25
-    local Pos = typeof(thing) == "Instance" and thing.Position or typeof(thing) == "CFrame" and thing.Position or typeof(thing) == "Vecotr3" and thing or thing
-    local dis = (hrp.Position - Pos).Magnitude or nil
-    local t = dis and dis / speed or 5
-    
-    local Info = TweenInfo.new(t, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
-    local TweenPlay = game:GetService("TweenService"):Create(hrp, Info, {CFrame = CFrame.new(thing)})
-    
-    return TweenPlay
-end
+local TabHandler = Instance.new("Frame")
+local SelectedTab = Instance.new("Frame")
+local Frame = Instance.new("Frame")
 
-Funcs.CheckRole = function(player)
-    local sheriff = player:FindFirstChild("Backpack") and player.Backpack:FindFirstChild("Gun") or player.Character:FindFirstChild("Gun") ~= nil
-    local murder =  player:FindFirstChild("Backpack") and player.Backpack:FindFirstChild("Knife") or player.Character:FindFirstChild("Knife") ~= nil
-    
-    if murder then
-        return "Murder"
-    end
-    
-    if sheriff then
-        return "Sheriff"
-    end
-    
-    return "Inc"
-end
 
-Funcs.CheckRoles = function()
-    local result = {
-      Murder,
-      Sheriff,
-      Inc = {}
-    }
+Window.__index = Window
+Buttons.__index = Buttons
+Tab.__index = Tab
+Sliders.__index = Sliders
+Labels.__index = Labels
+Toggle.__index = Toggle
+Notify.__index = Notify
+DropDown.__index = DropDown
+DropDownObject.__index = DropDownObject
 
-    for k, player in pairs(plrs:GetPlayers()) do
-        if player and player:FindFirstChild("Backpack") and player.Character then
-            local sheriff = (player.Backpack:FindFirstChild("Gun")) or (player.Character:FindFirstChild("Gun")) ~= nil
-            local murder = (player.Backpack:FindFirstChild("Knife")) or (player.Character:FindFirstChild("Knife")) ~= nil
-            
-            if murder then
-                result.Murder = player
-            elseif sheriff then
-                result.Sheriff = player
-            else
-                result.Inc[player] = "Inc"
+function ChangeMode()
+    local modeColors = NightMode and NightModeColors or LightModeColors
+
+    for _, v in pairs(Tabs) do
+        if v.Name == "Main" then
+            v.Parent.BackgroundColor3 = modeColors.BackGroundColor
+            v.BackgroundColor3 = modeColors.MainFrameColor
+            v.Parent.TabHandler.BackgroundColor3 = modeColors.MainFrameColor
+
+            for _, tab in pairs(v.Parent.TabHandler:GetChildren()) do
+                if tab.Name == "b" then
+                    tab.BackgroundColor3 = modeColors.ButtonsColor
+                    tab.TextColor3 = modeColors.TextColor
+                end
+            end
+
+            for _, element in pairs(v:GetDescendants()) do
+                if element:IsA("TextButton") or element:IsA("TextLabel") then
+                	element.TextColor3 = modeColors.TextColor
+                	if element.Name == "Slider Fill" then
+                		element.BackgroundColor3 = modeColors.SlidersFillColor[1]
+                	elseif element.Name == "Slider Display" then
+                		element.BackgroundColor3 = modeColors.SlidersFillColor[2]
+                	end
+                    element.BackgroundColor3 = modeColors.ButtonsColor
+                    local dropDownFrame = element:FindFirstChild("Drop Down Frame")
+                    if dropDownFrame then
+                        dropDownFrame.BackgroundColor3 = modeColors.MainFrameColor
+                    end
+                end
             end
         end
     end
-
-    return result
-end
-
-Funcs.WatchAttributeChange = function(instance)
-  assert(typeof(instance) == "Instance", "Error: Expected an Instance parameter, (got: "..type(instance)..")")
-
-  instance.AttributeChanged:Connect(function(attributeName)
-    print("Attribute changed:", attributeName, "New Value:", instance:GetAttribute(attributeName))
-  end)
-end
-
-
--- Main functions
-
-local Tweening = false
-Funcs.AutoFarm = function(s)
-  
-  if not s then
-    hum.PlatformStand = false
-    workspace.Gravity = 196.2
-    Funcs.NoClip()
-    Funcs.Tween(plr,hrp.Position + Vector3.new(0,6,0))
-    return
-  end
-  
-  
-  hum.PlatformStand = true
-  workspace.Gravity = 0
-	if NoClip == false then
-		Funcs.NoClip()
-	end
-  -- Locate CoinsPath once for efficiency
-  local CoinsPath
-  local MinDistance = 500
-  CoinsPath = CoinsPath or workspace:FindFirstChild("CoinContainer", true)
-  
-  if not CoinsPath or CoinsPath ~= workspace:FindFirstChild("CoinContainer",true) then
-    workspace.Gravity = oldGravity
-    repeat
-      CoinsPath = CoinsPath or workspace:FindFirstChild("CoinContainer", true)
-      task.wait()
-    until CoinsPath ~= nil
-  end
-  
-  local ClosesetCoin = nil
-
-  if Currency == 40 then
-    MinDistance = 500
-    hum.Health = 0
-    Currency = 0
-    return
-  end
-  
-  for _, coin in pairs(CoinsPath:GetChildren()) do
-      if coin:IsA("BasePart") then
-          local Type = coin:GetAttribute("CoinID")
-          local isCollected = coin:GetAttribute("Collected") or false
-          local Distance = (hrp.Position - coin.Position).Magnitude
-  
-          
-          if (env.maxDistance > Distance) and not isCollected and (Type == AutoFarmTypeString or AutoFarmTypeString == "All") then
-              if Distance < MinDistance then
-                  
-                  ClosesetCoin = coin
-                  if Distance < 50 then
-                  	MinDistance = 25
-                  else
-                  	MinDistance = Distance
-                  end
-              end
-          end
-      end
-  end
-  
-  if ClosesetCoin and Tweening == false then
-    ClosesetCoin.Size = Vector3.new(5,7,5)
-    local isCollected = ClosesetCoin:GetAttribute("Collected") or false
-    if isCollected then return end
-    local UnderCoin = ClosesetCoin.Position - Vector3.new(0,5,0)
-    
-    Tweening = Funcs.Tween(plr, UnderCoin,AutoFarmSpeed)
-    Tweening:Play()
-	
-    Tweening.Completed:Wait()
-    task.wait(Dealay)
-    Tweening = false
-  end
-  
 end
 
 
 
-Funcs.NoClip = function()
-  NoClip = not NoClip
-  for _, descendant in pairs(Char:GetDescendants()) do
-    if descendant:IsA("BasePart") then
-      descendant.CanCollide = NoClip
-    end
-  end
+function TweenColor(Color,Object,Style)
+  local Tween = TweenService:Create(Object, Style or TweenStyle, {
+    BackgroundColor3 = Color
+})
+Tween:Play()
 end
 
-
--- Murder functions
-
-Funcs.KillAll = function(s)
-  if not s then
-    return
-  end
-  local isMurder = Funcs.CheckRole(plr)
-  if not isMurder == "Murder" then return end
-  local EquipingKnife = Char:FindFirstChild("Knife") ~= nil
-  if not EquipingKnife then
-    local Knife = plr.Backpack:FindFirstChild("Knife") or nil
-    if not Knife then return end 
-    Knife.Parent = Char
-  end
-  
-  for _,player in pairs(plrs:GetPlayers()) do
-    if player ~= game.Players.LocalPlayer and player.Character
-    and isAlive(player)
-    then
-      local CoinsPath = workspace:FindFirstChild("CoinContainer",true) or nil
-      if not CoinsPath then return end
-      local Map = CoinsPath.Parent:FindFirstChild("Map",true)
-      if isInGame(player,Map) then
-      	
-      	
-        workspace.Gravity = 0
-        local PlayerCharacter = player.Character
-        local PlayerHrp = PlayerCharacter:FindFirstChild("HumanoidRootPart")
-        hrp.CFrame = PlayerHrp.CFrame * CFrame.new(0, 0, 1)
-        task.wait(0.2)
-        VirtualUser:Button1Down(Vector2.new(0, 0))
-        VirtualUser:Button1Up(Vector2.new(0, 0))
-        
-      end
-    end
-  end
-  workspace.Gravity = 196.2
+function TweenPosition(To,Object,Style)
+  local Tween = TweenService:Create(Object, Style or TweenStyle, {
+    Position = To
+})
+Tween:Play()
 end
 
-Funcs.ToSheriff = function()
-    local Sheriff = Funcs.CheckRoles()["Sheriff"] or nil
-    if Sheriff and isAlive(Sheriff) then
-        
-        local SheriffHRP = Sheriff.Character:FindFirstChild("HumanoidRootPart")
-        if SheriffHRP then
-            local LookVector = SheriffHRP.CFrame.LookVector
-            hrp.CFrame = SheriffHRP.CFrame - (LookVector * 10) -- 10 studs behind
+local instances = {}
+local Padding = 20
+
+function EasyTween(object, prop, value, style)
+    local info = style or TweenInfo.new(0.3, Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
+    local Tween = TweenService:Create(object, info, {
+        [prop] = value
+    })
+    Tween:Play()
+    return Tween
+end
+
+function findKeyIndex(array, key)
+    for index, value in ipairs(array) do
+        if value == key then
+            return index
         end
     end
+    return nil
 end
 
--- Visual functions
 
-Funcs.ESP = function(s)
-    local rolesT = Funcs.CheckRoles()
+local runService = game:GetService("RunService")
 
-    if not s then
-        -- Turn off ESP by destroying highlights
-        if rolesT.Murder and rolesT.Murder.Character and rolesT.Murder.Character:FindFirstChild("esp") then
-            rolesT.Murder.Character.esp:Destroy()
-        end
-        if rolesT.Sheriff and rolesT.Sheriff.Character and rolesT.Sheriff.Character:FindFirstChild("esp") then
-            rolesT.Sheriff.Character.esp:Destroy()
-        end
-        table.foreach(rolesT.Inc, function(key, value)
-            if key and key.Character and key.Character:FindFirstChild("esp") then
-                key.Character.esp:Destroy()
-            end
-        end)
-        return
+local function tweenColor(textLabel,text, duration)
+    local startTime = tick()
+    local function lerp(a, b, t)
+        return a + (b - a) * t
     end
 
-    -- Turn on ESP by creating highlights
-    local murder = rolesT.Murder
-    local sheriff = rolesT.Sheriff
-    local Incs = rolesT.Inc
+    runService.RenderStepped:Connect(function()
+        local elapsed = tick() - startTime
+        if elapsed > duration then return end
 
-    if murder and murder.Character and not murder.Character:FindFirstChild("esp") then
-        local MurderEsp = Instance.new("Highlight")
-        MurderEsp.Parent = murder.Character
-        MurderEsp.FillColor = Color3.fromRGB(255, 0, 0)
-        MurderEsp.Name = "esp"
-    end
+        local t = elapsed / duration
+        local r = lerp(255, 0, t)
+        local g = lerp(0, 255, t)
+        local b = lerp(0, 0, t)
 
-    if sheriff and sheriff.Character and not sheriff.Character:FindFirstChild("esp") then
-        local SheriffEsp = Instance.new("Highlight")
-        SheriffEsp.Parent = sheriff.Character
-        SheriffEsp.FillColor = Color3.fromRGB(0, 0, 255)
-        SheriffEsp.Name = "esp"
-    end
-
-    table.foreach(Incs, function(p, value)
-        if p and p.Character and not p.Character:FindFirstChild("esp") then
-            local IncEsp = Instance.new("Highlight")
-            IncEsp.Parent = p.Character
-            IncEsp.FillColor = Color3.fromRGB(0, 255, 0)
-            IncEsp.Name = "esp"
-        end
+        textLabel.Text = string.format('<font color="rgb(%d,%d,%d)">Your Text</font>', r, g, b)
+        textLabel.RichText = true
     end)
-    
-    -- Update roles if they already have ESP 
-    if murder and murder.Character and murder.Character:FindFirstChild("esp") then
-        local MurderEsp = murder.Character:FindFirstChild("esp")
-        MurderEsp.FillColor = Color3.fromRGB(255, 0, 0)
-    end
-
-    if sheriff and sheriff.Character and sheriff.Character:FindFirstChild("esp") then
-        local SheriffEsp = sheriff.Character:FindFirstChild("esp")
-        SheriffEsp.FillColor = Color3.fromRGB(0, 0, 255)
-    end
-
-    table.foreach(Incs, function(p, value)
-        if p and p.Character and p.Character:FindFirstChild("esp") then
-            local IncEsp = p.Character:FindFirstChild("esp")
-            IncEsp.FillColor = Color3.fromRGB(0, 255, 0)
-        end
-    end)
-    
-end
-
-Funcs.Xray = function(t)
-    if t then
-        -- Functionality for Xray (not implemented)
-    end
-end
-
-Funcs.ESPGun = function(s)
-    if not s then
-        for _,instance in pairs(workspace:GetDescendants()) do
-            if (instance.Name == "GunDrop") and instance:FindFirstChild("ESP") then
-                instance.ESP:Destroy()
-                return
-            end
-        end
-        return
-    end
-    
-    local gun
-	  for _,instance in pairs(workspace:GetDescendants()) do
-	        if instance.Name == "GunDrop" then
-	            gun = instance
-	            break
-	        end
-	  end
-  if not gun then return end
-  local esp = Instance.new("Highlight")
-  esp.Name = "ESP"
-  esp.FillColor = Color3.fromRGB(0,255,0)
-  esp.Parent = gun
-  esp.Adornee = gun
 end
 
 
 
 
---Sheriff functions
+function Window.new(data)
+local self = setmetatable({},Window)
 
-Funcs.AutoShoot = function(s)
-    if not s then
-        return
+self.Sg = Instance.new("ScreenGui")
+self.Shadow = Instance.new("ImageLabel")
+self.Corner = Instance.new("UICorner")
+self.Corner2 = Instance.new("UICorner")
+self.Corner3 = Instance.new("UICorner")
+self.Corner4 = Instance.new("UICorner")
+self.title = Instance.new("TextLabel")
+self.List = Instance.new("UIListLayout")
+self.List2 = Instance.new("UIListLayout")
+self.Border = Instance.new("UIStroke")
+self.Border2 = Instance.new("UIStroke")
+self.Apear = Instance.new("ImageButton")
+self.Close = Instance.new("TextButton")
+
+self.Sg.Parent = CoreUi
+Frame.Parent = self.Sg
+self.Corner.Parent = Frame
+self.Corner2.Parent = TabHandler
+self.Corner3.Parent = self.Close
+self.title.Parent = Frame
+TabHandler.Parent = Frame
+self.Shadow.Parent = Frame
+self.Apear.Parent = Frame
+self.Close.Parent = self.Sg
+SelectedTab.Parent = Frame
+
+self.Sg.Name = "Tiger Hub"
+
+Frame.Size = UDim2.new(0.55, 0, 0.60, 0)
+Frame.Position = UDim2.new(0, 0.5, 0, 0.5)
+Frame.Active = true
+Frame.Draggable = true
+Frame.Name = "Main Frame"
+Frame.BackgroundColor3 = NightModeColors.BackGroundColor
+
+
+self.title.BackgroundTransparency = 1
+self.title.Text = data.Name
+self.title.Font = Enum.Font.DenkOne
+self.title.TextSize = 16
+self.title.TextColor3 = NightModeColors.TextColor
+self.title.Position = UDim2.new(0.1,0,0.94,0)
+self.title.ZIndex = 99
+
+self.Corner.CornerRadius = UDim.new(0, 6)
+self.Corner2.CornerRadius = UDim.new(0, 20)
+self.Corner2.CornerRadius = UDim.new(0,6)
+
+TabHandler.Size = UDim2.new(0.20, 0, 1, 0)
+TabHandler.BackgroundColor3 = NightModeColors.MainFrameColor
+TabHandler.Name = "TabHandler"
+
+self.List.Parent = TabHandler
+self.List.Padding = UDim.new(0.025,0)
+
+self.List2.Parent = self.TabFrame
+self.List2.Padding = UDim.new(0.01,0)
+
+self.Border.Parent = Frame
+self.Border.Thickness = 1
+
+self.Border2.Parent = TabHandler
+self.Border2.Thickness = 1
+
+self.Shadow.Size = UDim2.new(3,0,3,0)
+self.Shadow.ZIndex = -1
+self.Shadow.Image = "rbxassetid://18810622958"
+self.Shadow.ImageTransparency = 0
+self.Shadow.BackgroundTransparency = 1
+self.Shadow.Position = UDim2.new(-1,0,-1,0)
+
+self.Close.Size = UDim2.new(0.07,0,0.07,0)
+self.Close.Position = UDim2.new(0.478,0,0.05,0)
+self.Close.BackgroundColor3 = Color3.fromRGB(239, 68, 35)
+self.Close.TextSize = 14
+self.Close.Font = Enum.Font.DenkOne
+self.Close.ZIndex = math.huge
+self.Close.Text = "X"
+
+self.Close.MouseButton1Click:Connect(function() 
+  self.Close.Parent["Main Frame"].Visible = not self.Close.Parent["Main Frame"].Visible
+  if self.Close.Parent["Main Frame"].Visible then
+    self.Close.Text = "X"
+    else
+      self.Close.Text = "+"
     end
+end)
+SelectedTab.Size = UDim2.new(0.01,0,0.07,0)
+SelectedTab.BackgroundColor3 = Color3.fromRGB(0,170,255)
+SelectedTab.Position = UDim2.new(0.01,0,0.01,0)
 
-    local role = Funcs.CheckRole(plr)
+self.Corner4.Parent = SelectedTab
+self.Corner4.CornerRadius = UDim.new(0,6)
+-- Settings setup
+local settings = Window:NewTab({Name = "Settings"})
 
-    if role == "Sheriff" then
-        local Remote
-        
-        -- Wait until the gun is found
-        repeat
-            task.wait()
-            if not Funcs.CheckRole(plr) == "Sheriff" then return end
-            local s,r = pcall(function()
-            	return Char.Gun.KnifeLocal.CreateBeam.RemoteFunction
-            end)
-            Remote = r
-        until Remote ~= nil
-
-        local Roles = Funcs.CheckRoles()
-        local Murder = Roles.Murder
-
-        if Murder == nil then return end
-
-        -- Check for obstacles or a clear path
-        local MurderPosition = Murder.Character.HumanoidRootPart.Position
-        local SheriffPosition = Char.HumanoidRootPart.Position
-        local RayParams = RaycastParams.new()
-        RayParams.FilterDescendantsInstances = {Char} -- Ignore own character only
-        RayParams.FilterType = Enum.RaycastFilterType.Blacklist
-
-        local rayResult = workspace:Raycast(SheriffPosition, (MurderPosition - SheriffPosition).Unit * 500, RayParams)
-
-        -- If ray hits the murderer or doesn't hit anything, shoot
-        if not rayResult or (rayResult.Instance:IsDescendantOf(Murder.Character)) then
-            -- Change position to the part that reaveld
-            -- and Shoot the Murderer
-            MurderPosition = rayResult.Instance.Position or rayResult.Instance.CFrame.Position
-            local args = {
-                [1] = 1,
-                [2] = MurderPosition,
-                [3] = "AH2"
-            }
-            
-            Remote:InvokeServer(unpack(args))
-        end
-    end
-end
-
-
-
-Funcs.GrabGun = function()
-  local gun
-  for _,instance in pairs(workspace:GetDescendants()) do
-        if instance.Name == "GunDrop" then
-            gun = instance
-            break
-        end
-  end
-  if not gun then return end
-  local name,version = getexecutorname()
-  local s = true
-  if s then
-  	firetouchinterest(hrp, gun,0)
-  	wait()
-  	firetouchinterest(hrp, gun,1)
-	return
-  end
-  
-  local orgPos = hrp.Position
-  local GoTween = Funcs.Tween(plr,gun.Position,100)
-  local ReturnTween = Funcs.Tween(plr,orgPos,100)
-  GoTween:Play()
-  GoTween.Completed:Wait()
-  ReturnTween:Play()
-end
-
-Funcs.ToMurder = function()
-    local Murder = Funcs.CheckRoles()["Murder"] or nil
-    if Murder and isAlive(Murder) then
-        local MurderHRP = Murder.Character:FindFirstChild("HumanoidRootPart")
-        if MurderHRP then
-            local LookVector = MurderHRP.CFrame.LookVector
-            hrp.CFrame = MurderHRP.CFrame - (LookVector * 10) -- 10 studs behind
-        end
-    end
-end
-
--- Main
-local Main = Window:NewTab({
-    Name = "Main"
-})
-
-local discord = Main:NewSection({
-    Name = "Join my Discord!"
-},14)
-local CopyDiscordLink = Main:NewButton({
-  Name = "Copy Discord link <3",
-  Callback = function()
-    setclipboard("https://discord.gg/9w6BqKz9")
-  end,
-})
-
-local AutoFarmSection = Main:NewSection({
-  Name = "AutoFarm"
-})
-
-local AutoFarmToggle = Main:NewToggle({
-  Name = "Start AutoFarm",
-  Callback = Funcs.AutoFarm,
-  Value = AutoFarmValue
-})
-
-local DealaySlider = Main:NewSlider({
-  Name = "Auto Farm Dealay",
-  Start = 1,
-  Max = 2.5,
-  Callback = function(value)
-    Dealay = value
-  end
-})
-
-local AutoFarmSpeed = Main:NewSlider({
-  Name = "Auto Farm Speed ",
-  Start = 25,
-  Max = 100,
-  Callback = function(value)
-    Dealay = value
-  end
-})
-
-
-local LocalPlayerSection = Main:NewSection({
-  Name = "Local Player"
-})
-
-local NoClip = Main:NewButton({
-  Name = "No Clip",
-  Callback = Funcs.NoClip
-})
-
-
-local SpeedSlider = Main:NewSlider({
-  Name = "Speed",
-  Start = 16,
-  Max = 20,
-  Callback = function(value)
-    hum.WalkSpeed = value
-  end
-})
-
-local JumpSlider = Main:NewSlider({
-  Name = "Jump",
-  Start = hum.JumpPower,
-  Max = 1000,
-  Callback = function(value)
-    hum.JumpPower = value
-  end
-})
-
-
-
--- murder
-local Murder = Window:NewTab({Name="Murder"})
-
-local KillAll = Murder:NewToggle({
-  Name = "Auto Win",
-  Callback = Funcs.KillAll,
-  Value = KillAllValue
-})
-
-local TeleportToSheriff = Murder:NewButton({
-  Name = "Teleport To Sheriff",
-  Callback = Funcs.ToSheriff
-})
-
--- Sheriff
-local Sheriff = Window:NewTab({
-    Name = "Sheriff"
-})
-
-local AutoShoot = Sheriff:NewToggle({
-    Name = "Auto Shoot",
-    Value = AutoShoot,
-    Callback = Funcs.AutoShoot
-})
-
-local GrabGun = Sheriff:NewButton({
-  Name = "Grab Gun",
-  Callback = Funcs.GrabGun
-})
-
-local TeleportToMurder = Sheriff:NewButton({
-  Name = "Teleport To Murder",
-  Callback = Funcs.ToMurder
-})
-
--- Visual
-local Visual = Window:NewTab({
-    Name = "Visual"
-})
-
-local playersESP = Visual:NewToggle({
-    Name = "ESP",
-    Value = esp,
-    Callback = Funcs.ESP
-})
-
-local gunESP = Visual:NewButton({
-  Name = "ESP Gun",
-  Callback = Funcs.ESPGun
-})
--- misc
-local misc = Window:NewTab({Name="Misc"})
-
-local JumpButtonPos = misc:NewButton({
-  Name = "Change Jump button position(for mobile only)",
-  Callback = function()
-    env.JumpPosition = not env.JumpPosition
-      if env.JumpPosition then 
-          game:GetService("Players").LocalPlayer.PlayerGui.TouchGui.TouchControlFrame.JumpButton.Position = UDim2.new(1, -95, 0.400000006, -95)
-      else 
-          game:GetService("Players").LocalPlayer.PlayerGui.TouchGui.TouchControlFrame.JumpButton.Position = oldPos
-      end
-  end
-})
-local R6 = misc:NewButton({
-  Name = "R6",
-  Callback = function() loadstring(game:HttpGet(('https://raw.githubusercontent.com/Imagnir/r6_anims_for_r15/main/r6_anims.lua'),true))() end
-})
-
-local AntiAfk = misc:NewButton({
-	Name = "Anti-Afk",
+local Mode = settings:NewButton({
+	Name = "Background color",
 	Callback = function()
-		env.AntiAfk = not env.AntiAfk
-		local stat = env.AntiAfk == true and "On" or "Off"
-		local color = env.AntiAfk == true and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
-		Window:Notify({
-			Title = "Changed Anti-Afk status!",
-			Info = "Anti-Afk: " .. stat ,
-			ColorText = {
-	    		Text = nil,
-	    		TitleColor = nil,
-	    		Text2 = stat,
-	    		InfoColor = color,
-    		},
-    		Duration = 3
-		})
+		NightMode = not NightMode
+		ChangeMode()
 	end
 })
 
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0.2, 0, 1, 0)
+frame.Position = UDim2.new(0.8, 0, 0, 0)
+frame.ClipsDescendants = true -- Ensures items don't appear outside
+frame.Parent = self.Sg
+frame.BackgroundTransparency = 1
 
---[[
-local function ChangeAnimation(character)
-    -- Get humanoid and animator
-    local humanoid = character:WaitForChild("Humanoid")
-    local animator = humanoid:WaitForChild("Animator")
+function updatePositions()
+    -- Re-tween all remaining instances
+    for i, instance in ipairs(instances) do
+        local targetY = 1 - ((i * (50 + Padding)) / frame.AbsoluteSize.Y)
+        local tween = TweenService:Create(
+            instance,
+            TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {Position = UDim2.new(0, 0, targetY, 0)}
+        )
+        tween:Play()
+    end
+end
 
-    -- Stop all playing animations
-    for _, playingTrack in animator:GetPlayingAnimationTracks() do
-        playingTrack:Stop(0)
+function Color3ToHex(color)
+    -- Ensure the RGB values are scaled properly from 0-1 to 0-255
+    local r = math.clamp(math.floor(color.R * 255), 0, 255)
+    local g = math.clamp(math.floor(color.G * 255), 0, 255)
+    local b = math.clamp(math.floor(color.B * 255), 0, 255)
+    
+    -- Format as a HEX string
+    return string.format("#%02X%02X%02X", r, g, b)
+end
+
+function self:Notify(data)
+	if data.ColorText then
+        local info = data.ColorText
+        if info.TitleColor and info.Text then
+            local TitleColor = info.TitleColor
+            local Text = info.Text
+            local Converted = Color3ToHex(TitleColor)
+            data.Title = data.Title:gsub(Text, '<font color="' .. Converted .. '">' .. Text .. "</font>")
+        end
+        if info.InfoColor and info.Text2 then
+            local InfoColor = info.InfoColor
+            local Text2 = info.Text2
+            local Converted = Color3ToHex(InfoColor)
+            data.Info = data.Info:gsub(Text2, '<font color="' .. Converted .. '">' .. Text2 .. "</font>")
+        end
     end
 
-    -- Wait for the Animate script
-    local animateScript = character:WaitForChild("Animate")
+    -- Create the new instances
+    local NotifyMain = Instance.new("Frame")
+    NotifyMain.Size = UDim2.new(0.7, 0, 0.2, 0)
+    NotifyMain.Position = UDim2.new(0.3, 0, 1, 0) -- Start off-screen at the bottom
+    NotifyMain.BackgroundTransparency = 0
+    NotifyMain.Parent = frame
+    NotifyMain.BackgroundColor3 = Color3.fromRGB(44, 47, 46)
+
+    local UICorner = Instance.new("UICorner")
+    UICorner.Parent = NotifyMain
+    UICorner.CornerRadius = UDim.new(0, 9)
+
+    local Title = Instance.new("TextLabel")
+    Title.Parent = NotifyMain
+    Title.TextSize = 16
+    Title.TextScaled = true
+    Title.Position = UDim2.new(0.06, 0, 0, 5)
+    Title.Size = UDim2.new(0.92, 0, 0.4, 0)
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.BackgroundTransparency = 1
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Text = data.Title
+    Title.RichText = true
+
+    local Info = Instance.new("TextLabel")
+    Info.Parent = NotifyMain
+    Info.TextSize = 6
+    Info.TextWrapped = true
+    Info.Position = UDim2.new(0.06, 0, 0.4, 0)
+    Info.Size = UDim2.new(0.92, 0, 0.5, 0)
+    Info.BackgroundTransparency = 1
+    Info.TextXAlignment = Enum.TextXAlignment.Left
+    Info.TextColor3 = Color3.fromRGB(169, 169, 169)
+    Info.Text = data.Info
+    Info.RichText = true
     
-    -- Set custom animation IDs for each action
-    animateScript.run.RunAnim.AnimationId = "rbxassetid://742638842"
-    animateScript.walk.WalkAnim.AnimationId = "rbxassetid://742640026"  
-    animateScript.jump.JumpAnim.AnimationId = "rbxassetid://742637942"
-    animateScript.idle.Animation1.AnimationId = "rbxassetid://742637544"
-    animateScript.idle.Animation2.AnimationId = "rbxassetid://742638445"
-    animateScript.fall.FallAnim.AnimationId = "rbxassetid://885477856"
-    animateScript.swim.Swim.AnimationId = "rbxassetid://742639220"
-    animateScript.swimidle.SwimIdle.AnimationId = "rbxassetid://742639812"  
-    animateScript.climb.ClimbAnim.AnimationId = "rbxassetid://742636889"
+    if data.ColorText.RGB then
+    	tweenColor(Info,data.ColorText.RGBtext,data.ColorText.RGBDuration or 3)
+   end
+    
+    -- Add the new instance to the table
+    table.insert(instances, NotifyMain)
+
+    -- Animate all instances upwards
+    updatePositions()
+
+    -- Remove instance after the specified duration
+    task.spawn(function()
+        task.wait(data.Duration)
+        local index = findKeyIndex(instances, NotifyMain)
+        if index then
+            table.remove(instances, index)
+            for _,ch in pairs(NotifyMain:GetChildren()) do
+            	if ch:IsA("TextLabel") then
+            		EasyTween(ch, "TextTransparency", 1)
+            	end
+            end
+            EasyTween(NotifyMain, "BackgroundTransparency", 1)
+            task.wait(0.3)
+            updatePositions()
+            NotifyMain:Destroy()
+        end
+    end)
+end
+
+return self
 end
 
 
---]]
 
-task.spawn(function()
-	local VirtualUser = game:GetService("VirtualUser")
-	while task.wait(20) do
-		if getgenv().AntiAfk then
-			VirtualUser:Button1Down(Vector2.new(0, 0))
-        	VirtualUser:Button1Up(Vector2.new(0, 0))
+function Window:NewTab(data)
+local self = setmetatable({},Tab)
+
+self.List2 = Instance.new("UIListLayout")
+self.TabBtn = Instance.new("TextButton")
+self.Corner = Instance.new("UICorner")
+self.Corner2 = Instance.new("UICorner")
+self.TabFrame = Instance.new("ScrollingFrame")
+
+--self.Corner.Parent = self.TabBtn
+self.Corner2.Parent = self.TabFrame
+
+self.Corner.CornerRadius = UDim.new(0, 6)
+self.Corner2.CornerRadius = UDim.new(0, 6)
+
+self.TabBtn.Size = UDim2.new(1, 0, 0.1, 0)
+self.TabBtn.BackgroundTransparency = 1
+self.TabBtn.Text = data.Name
+self.TabBtn.Font = Enum.Font.DenkOne
+self.TabBtn.Parent = TabHandler
+self.TabBtn.TextColor3 = NightModeColors.TextColor
+self.TabBtn.TextSize = 14
+self.TabBtn.Name = "b"
+self.TabBtn.BackgroundColor3 = NightModeColors.ButtonsColor
+
+self.TabFrame.Parent = Frame
+self.TabFrame.Size = UDim2.new(0.79,0,0.979,0)
+self.TabFrame.Position = UDim2.new(0.21,0,0.01,0)
+self.TabFrame.Visible = false
+self.TabFrame.Name = "Main"
+self.TabFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+self.TabFrame.ScrollBarThickness = 0.1
+self.TabFrame.BackgroundTransparency = 1
+self.TabFrame.CanvasSize = UDim2.new(0,0,0,0)
+
+self.List2.Parent = self.TabFrame
+self.List2.Padding = UDim.new(0.01,0)
+
+local t = self.TabBtn.BackgroundColor3
+Tabs[data.Name] = self.TabFrame
+local yPos = self.TabBtn.AbsolutePosition.Y
+
+self.TabBtn.MouseButton1Click:Connect(function()
+	
+	local Tween = TweenService:Create(SelectedTab, TweenInfo.new(0.5,Enum.EasingStyle.Exponential), {
+	    Position = UDim2.new(0.01,0,0,yPos + 3)
+	})
+	Tween:Play()
+	
+	--[[local ta = EasyTween(SelectedTab,"BackgroundTransparency",1)
+	ta.Completed:Connect(function()
+		SelectedTab.Position = UDim2.new(0.01,0,0,yPos + 3)
+		EasyTween(SelectedTab,"BackgroundTransparency",0)
+	end)]]
+	
+	for k,v in pairs(Tabs) do
+		if k ~= data.Name then
+			
+			EasyTween(v,"Position",UDim2.new(0.21,0,0.1,0))
+	    	for _, element in pairs(v:GetChildren()) do
+				if element:IsA("TextButton") then
+					EasyTween(element,"BackgroundTransparency",1)
+					EasyTween(element,"TextTransparency",1)
+				elseif element:IsA("TextLabel") then
+					EasyTween(element,"TextTransparency",1)
+				end
+				
+	    	end
+			v.Visible = false
+			
+			for _,Child in next,v.Parent.TabHandler:GetChildren() do
+				if Child:IsA("TextButton") and Child.Name == "b" then
+		    		if NightMode then
+	    				--Child.BackgroundColor3 = NightModeColors.ButtonsColor
+	    				EasyTween(Child,"BackgroundTransparency",1)
+	    			else
+	        			--Child.BackgroundColor3 = LightModeColors.ButtonsColor
+						EasyTween(Child,"BackgroundTransparency",1)
+					end
+				end
+			end
+		elseif k == data.Name then
+			-- TabFrame original Position: {0.209999993, 0}, {0.00999999978, 0}
+			
+			EasyTween(v,"Position",UDim2.new(0.21,0,0.01,0))
+			for _, element in pairs(v:GetChildren()) do
+				if element:IsA("TextButton") then
+					EasyTween(element,"BackgroundTransparency",0)
+					EasyTween(element,"TextTransparency",0)
+				elseif element:IsA("TextLabel") then
+					EasyTween(element,"TextTransparency",0)
+				end
+			end
+			v.Visible = true
 		end
 	end
 end)
+function self:NewButton(data)
+local button = setmetatable({},Buttons)
+
+button.button = Instance.new("TextButton")
+button.Corner = Instance.new("UICorner")
+
+button.button.Parent = self.TabFrame
+button.button.Text = "	"..data.Name
+button.button.Font = Enum.Font.DenkOne
+button.button.Size = Sizes.Buttons
+button.button.Position = UDim2.new(0.5,0,0.5,0)
+button.button.TextColor3 = NightModeColors.TextColor
+button.button.TextSize = 14
+button.button.Name = "a"
+button.button.ZIndex = 999
+button.button.TextXAlignment = Enum.TextXAlignment.Left
+button.button.BackgroundTransparency = 0
+
+button.Corner.Parent = button.button
+button.Corner.CornerRadius = UDim.new(0,6)
+
+button.button.BackgroundColor3 = Color3.fromRGB(47,47,47)
+
+button.button.MouseButton1Click:Connect(function() 
+data.Callback()
+   end)
+   
+   
+   return button
+end
+function self:NewToggle(data)
+local toggle = setmetatable({},Toggle)
+
+toggle.button = Instance.new("TextButton")
+toggle.Corner = Instance.new("UICorner")
+toggle.Corner2 = Instance.new("UICorner")
+toggle.Corner3 = Instance.new("UICorner")
+toggle.Container = Instance.new("Frame")
+toggle.Stat = Instance.new("Frame")
+
+toggle.button.Parent = self.TabFrame
+toggle.button.Text = "	"..data.Name
+toggle.button.Font = Enum.Font.DenkOne
+toggle.button.Size = Sizes.Toggles
+toggle.button.Position = UDim2.new(0.5,0,0.5,0)
+toggle.button.TextColor3 = NightModeColors.TextColor
+toggle.button.TextSize = 14
+toggle.button.Name = "a"
+toggle.button.TextXAlignment = Enum.TextXAlignment.Left
+toggle.button.BackgroundColor3 = NightModeColors.ButtonsColor
+
+toggle.Container.Parent = toggle.button
+toggle.Container.Size = UDim2.new(0.09,0,0.7,0)
+toggle.Container.Position = UDim2.new(0.84,0,0.179,0)
+toggle.Container.BackgroundColor3 = NightModeColors.ToggleContainer
+
+toggle.Stat.Parent = toggle.button
+toggle.Stat.Size = UDim2.new(0.05,0,0.7,0)
+toggle.Stat.Position = UDim2.new(0.84,0,0.179,0)
+toggle.Stat.BackgroundColor3 = NightModeColors.OffToggleStat
+-- start = 84, end = 88
+toggle.Corner.Parent = toggle.button
+toggle.Corner.CornerRadius = UDim.new(0,6)
+
+toggle.Corner2.Parent = toggle.Stat
+toggle.Corner2.CornerRadius = UDim.new(99,99)
+
+toggle.Corner3.Parent = toggle.Container
+toggle.Corner3.CornerRadius = UDim.new(0,9)
+
+toggle.button.MouseButton1Click:Connect(function()
+		data.Value = not data.Value
+		local style = TweenInfo.new(0.30,Enum.EasingStyle.Linear)
+		local posStyle = TweenInfo.new(
+        	0.2, -- Duration
+        	Enum.EasingStyle.Quad, -- Smooth easing
+        	Enum.EasingDirection.Out -- Natural deceleration
+    	)
+    
+		if data.Value == false then
+			TweenColor(NightModeColors.OffToggleStat,toggle.Stat,style)
+			TweenPosition(UDim2.new(0.84,0,0.179,0),toggle.Stat,style)
+		else
+			TweenColor(Color3.fromRGB(75, 151, 75),toggle.Stat,style)
+			TweenPosition(UDim2.new(0.88,0,0.179,0),toggle.Stat,posStyle)
+		end
+		while data.Value do
+			wait()
+			data.Callback(data.Value)
+		end
+		if data.Value == false then
+			data.Callback(data.Value)
+		end
+	end)
+   return toggle
+end
+
+
+function self:NewSlider(data)
+  
+    
+  
+    local slider = setmetatable({},Sliders)
+    slider.Slider = Instance.new("Frame")
+    slider.Container = Instance.new("Frame")
+    slider.Fill = Instance.new("Frame")
+    slider.Trigger = Instance.new("TextButton")
+    slider.Display = Instance.new("TextLabel")
+    
+    slider.outputValue = (data.Start / data.Max)
+    
+    slider.Corner = Instance.new("UICorner")
+    slider.Corner2 = Instance.new("UICorner")
+    slider.sliderActive = false
+    
+	-- slider background
+    slider.Slider.Parent = self.TabFrame
+	slider.Slider.Size = Sizes.Sliders
+	slider.Slider.Name = "a"
+	slider.Slider.BackgroundTransparency = 0
+	slider.Slider.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	slider.Slider.ClipsDescendants = true
+	
+    slider.Corner.Parent = slider.Slider
+    slider.Corner.CornerRadius = UDim.new(0, 6)
+    
+    slider.Corner2.Parent = slider.Fill
+    slider.Corner2.CornerRadius = UDim.new(0, 6)
+    
+    slider.Container.Parent = slider.Slider
+    slider.Container.Size = UDim2.new(0.70,0,1,0)
+    slider.Container.BackgroundTransparency = 1
+    slider.Container.Position = UDim2.new(0.2,0,0,0)
+    -- the fill background
+    slider.Fill.Parent = slider.Container
+    slider.Fill.Size = UDim2.new(slider.outputValue, 0, 0.3, 0)
+    
+    slider.Fill.BackgroundColor3 = Color3.fromRGB(80, 200, 120)
+    --NightModeColors.SlidersFillColor[1]
+    slider.Fill.Name = "Slider Fill"
+    slider.Fill.Position = UDim2.new(0,0,0.4,0)
+    --slider.Fill.Visible = slider.sliderActive
+    
+    -- UI corner to make circle
+    slider.Circle = Instance.new("UICorner")
+    slider.Circle.Parent = slider.Trigger
+    slider.Circle.CornerRadius = UDim.new(999,99)
+    
+    slider.Trigger.Parent = slider.Container
+    slider.Trigger.BackgroundTransparency = 0
+    slider.Trigger.BackgroundColor3 = Color3.fromRGB(230,230,230)
+    slider.Trigger.Text = ""
+    slider.Trigger.Size = UDim2.new(0.025, 0, 0.42, 0)
+    slider.Trigger.Position = UDim2.new(slider.Fill.Position.X.Scale, slider.Fill.Position.X.Offset,0.3,1.5)
+    slider.Trigger.MouseButton1Down:Connect(function()
+        slider:ActivateSlider() 
+    end)
+    if not pcall(function() return self.TabFrame.Sliders end) then
+    self.SlidersFolder = Instance.new("Folder")
+    end
+	self.SlidersFolder.Parent = self.TabFrame
+	self.SlidersFolder.Name = "Sliders"
+	
+    --slider.Display.AnchorPoint = Vector2.new(0, 0.5)
+    slider.Display.BackgroundTransparency = 1
+    slider.Display.Position = UDim2.new(0, 0, 0, 0)
+    slider.Display.Size = UDim2.new(0.2, 0, 1, 0)
+    slider.Display.Parent = slider.Slider
+    slider.Display.Text = "	"..data.Name.." "..tostring(data.Start)
+    slider.Display.TextSize = 14
+    slider.Display.Font = Enum.Font.DenkOne
+    slider.Display.TextColor3 = NightModeColors.SlidersFillColor[2]
+    slider.Display.TextXAlignment = Enum.TextXAlignment.Left
+    slider.Display.Name = "Slider Display"
+    slider.Display.TextScaled = true
+    
+    game:GetService("UserInputService").InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            slider.sliderActive = false
+        end
+    end)
+    
+    function slider:UpdateSlider()
+    -- Calculate the output value based on the mouse position
+	    slider.output = math.clamp((Mouse.X - slider.Slider.AbsolutePosition.X) / slider.Slider.AbsoluteSize.X, 0, 1)
+	    data.Callback(math.round(slider.output * data.Max))
+	    
+	    if slider.outputValue ~= slider.output then
+	        
+	        
+	        TweenService:Create(slider.Fill, TweenInfo.new(0.2), { Size = UDim2.new(slider.output, 0, 0.3, 0) }):Play()
+	        
+	        local targetPosition = UDim2.new(slider.output, -slider.Trigger.AbsoluteSize.X / 2, 0.3, 1.5) -- Center thumb vertically
+	        TweenService:Create(slider.Trigger, TweenInfo.new(0.2), { Position = targetPosition }):Play()
+	        
+	    end
+	    
+	    slider.outputValue = slider.output
+	    slider.Display.Text = "	"..data.Name.." "..tostring(math.round(slider.output * data.Max))
+	end
+    function slider:ActivateSlider()
+        slider.sliderActive = true
+        while slider.sliderActive do
+            wait()
+            slider:UpdateSlider()
+        end
+    end
+    
+    return slider
+end
+
+function self:NewSection(data,Size)
+  
+local section = setmetatable({},Labels)
+section.label = Instance.new("TextLabel")
+section.Corner = Instance.new("UICorner")
+
+section.label.Parent = self.TabFrame
+section.label.Text = " "..data.Name
+section.label.Font = Enum.Font.DenkOne
+section.label.Size = UDim2.new(1, 0, 0.12, 0)
+section.label.Position = UDim2.new(0.5,0,0.5,0)
+section.label.TextSize = Size or 16
+section.label.Name = "a"
+section.label.BackgroundTransparency = 1
+section.label.TextXAlignment = Enum.TextXAlignment.Left
+section.label.TextColor3 = NightModeColors.TextColor
+section.Corner.Parent = section.label
+section.Corner.CornerRadius = UDim.new(0,6)
+
+   return section
+end
+
+function self:NewDropDown(data)
+  assert(type(data.Name) == "string","Error: data.Name Expected string type, got: "..type(data.Name))
+  assert(type(data.Callback) == "function","Error: data.Callback Expected function, got: "..type(data.Callback))
+  
+  local dropdown = setmetatable({},DropDown)
+  
+  local DropDownBtn = Instance.new("TextButton")
+  local DropDownFrame = Instance.new("ScrollingFrame")
+  local DropDownText = Instance.new("TextLabel")
+  local List = Instance.new("UIListLayout")
+  local Corner = Instance.new("UICorner")
+  local Corner2 = Instance.new("UICorner")
+  DropDownBtn.Parent = self.TabFrame
+  DropDownFrame.Parent = DropDownBtn
+  DropDownText.Parent = DropDownBtn 
+  
+  DropDownBtn.Size = Sizes.DropDowns
+  DropDownBtn.Text = ""
+  DropDownBtn.Font = Enum.Font.DenkOne
+  DropDownBtn.BackgroundColor3 = NightModeColors.ButtonsColor
+  DropDownBtn.TextSize = 14
+  DropDownBtn.TextColor3 = NightModeColors.TextColor
+  DropDownBtn.Name = "a"
+  DropDownBtn.TextXAlignment = Enum.TextXAlignment.Left
+  
+  DropDownFrame.Size = UDim2.new(0.5,0,0,0)
+  DropDownFrame.Position = UDim2.new(0.7,0,1,0)
+  DropDownFrame.Visible = false
+  DropDownFrame.BackgroundColor3 = NightModeColors.MainFrameColor
+  
+  DropDownText.Size = UDim2.new(0.3,0,1,0)
+  DropDownText.BackgroundTransparency = 1
+  DropDownText.Text = data.Name
+  DropDownText.Font = Enum.Font.DenkOne
+  DropDownText.TextSize = 14
+  DropDownText.TextColor3 = NightModeColors.TextColor
+  DropDownText.TextXAlignment = Enum.TextXAlignment.Left
+  
+  Corner.Parent = DropDownBtn
+  Corner.CornerRadius = UDim.new(0,6)
+  
+  Corner2.Parent = DropDownFrame
+  Corner2.CornerRadius = UDim.new(1,9)
+  
+  List.Parent = DropDownFrame
+  
+  local close = TweenService:Create(DropDownFrame,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{Size = UDim2.new(0.3,0,0,0)})
+  local open = TweenService:Create(DropDownFrame,TweenInfo.new(0.3,Enum.EasingStyle.Quad),{Size = UDim2.new(0.3,0,0,200)})
+  local Opened = false
+  DropDownBtn.MouseButton1Click:Connect(function()
+      if Opened then
+          close:Play()
+          Opened = false
+          task.wait(0.3)
+          DropDownFrame.Visible = false
+      else
+          DropDownFrame.Visible = true
+          open:Play()
+          task.wait(0.3)
+          Opened = true
+      end
+  end)
+  function dropdown:NewObject(data2)
+    
+  assert(type(data2.Name) == "string","Error: data.Name Expected string type, got: "..type(data2.name))
+    
+  local DropDownObject = setmetatable({},DropDownObject)
+  
+  DropDownObject.button = Instance.new("TextButton")
+  DropDownObject.corner = Instance.new("UICorner")
+  
+  DropDownObject.button.Parent = DropDownFrame
+  DropDownObject.button.Size = UDim2.new(1,0,0.1,0)
+  DropDownObject.button.BackgroundColor3 = Color3.fromRGB(0,0,0)
+  DropDownObject.button.ZIndex = 99999
+  DropDownObject.button.Text = data2.Name
+  DropDownObject.button.Font = Enum.Font.DenkOne
+  DropDownObject.button.TextSize = 14
+  DropDownObject.button.TextColor3 = NightModeColors.TextColor
+  DropDownObject.button.TextXAlignment = Enum.TextXAlignment.Left
+  DropDownObject.button.Name = "a"
+  
+  DropDownObject.corner.Parent = DropDownObject.button
+  DropDownObject.corner.CornerRadius = UDim.new(0,6)
+  
+  DropDownObject.button.MouseButton1Click:Connect(function()
+      close:Play()
+       DropDownText.Text = DropDownObject.button.Text
+      Opened = false
+      data.Callback( DropDownText.Text)
+      task.wait(0.3)
+      DropDownFrame.Visible = false
+    end)
+  
+  return DropDownObject
+end
+  return dropdown
+end
+-- edit tab elment after creating it (e.g adding tab name as first section)
+self:NewSection({Name = data.Name},24)
+
+return self
+-- end of the function
+end
+
+return Window
